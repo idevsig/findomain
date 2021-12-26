@@ -1,0 +1,19 @@
+## source ./env && python find.py
+
+## 钉钉
+export DINGTALK_ROBOT_TOKEN='' 
+export DINGTALK_ROBOT_SECRET=''
+
+## 
+### length：长度
+### suffixes: 后缀
+### type：类型，1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
+### isp：查询站点，west.西部数码，qcloud.腾讯云，zzidc.郑州景安
+### transfer：上传文件，具体 “https://github.com/dutchcoders/transfer.sh” 项目搭建的站点网址
+### characters: 自定义的字符串
+### start: 开始的域名(以此域名开始记录(含)，字符长度必须与 length 一致)
+### restart_url: 重新设置 start 字符的 URL
+#export DOMAIN_INFO='{"length": 3, "suffixes": "cc", "type": 1, "isp": "west", "transfer": "", "characters": "", "start": "", "restart_url": ""}'
+
+## 线上获取 DOMAIN_INFO 信息
+export DOMAIN_URL=''
