@@ -5,13 +5,14 @@ from dingtalk import Dingtalk
 from domain import Domain
 from whois import Whois
 
-class Entry(object):
+class Finder(object):
     def __init__(self):
-       # 日志文件
+        # 日志文件
         self.log_filename = 'domain.log'
         self.set_log_config()
 
-        # 域名信息
+        # 域名信息初始化
+        ## 默认为 通过西部数据平台查询 3 位纯数字的 cc
         self.domain_length = 3
         self.domain_suffixes = 'cc'
         self.domain_gen_type = 1
@@ -29,19 +30,45 @@ class Entry(object):
         token, secret = self.set_dingtalk()
         self.notifier = Dingtalk(token=token, secret=secret)
 
-        self.domain = Domain(self.domain_length, self.domain_characters)
+        # 域名生成器
+        self.domain_maker = Domain(self.domain_length, self.domain_characters)
 
-        # WHOIS
+        # 设置 WHOIS
         self.whois = Whois(self.whois_isp)
 
+    '''
+    设置日志配置
+    '''
+    def set_log_config(self):
+        # 清空文件
+        open(self.log_filename,'w').truncate()   
+
+        # 设置日志配置     
+        logging.basicConfig(
+                        # 控制台打印的日志级别
+                        level = logging.INFO, 
+                        filename = self.log_filename,
+
+                        # 模式，有w和a，w就是写模式，每次都会重新写日志，覆盖之前的日志
+                        # a 是追加模式，默认如果不写的话，就是追加模式
+                        filemode = 'a',
+                        # 日志格式
+                        format = '%(message)s'
+                        )
+
+    '''
+    设置域名配置
+    '''
     def set_domain_info(self):
-        print('DOMAIN_INFO: ', os.environ.get('DOMAIN_INFO'))
+        # print('DOMAIN_INFO: ', os.environ.get('DOMAIN_INFO'))
         info_str = os.environ.get('DOMAIN_INFO')
         if info_str == None:
+            # 通过 URL 获取域名配置信息
             url_str = os.environ.get('DOMAIN_URL')
             if url_str:
                 info_str = self.get_domain_info(url_str)
             
+        # 解析域名配置信息
         if info_str:
             info = json.loads(info_str)
             print(info)
@@ -75,23 +102,6 @@ class Entry(object):
         return None
 
     '''
-    设置日志配置
-    '''
-    def set_log_config(self):
-        # 清空文件
-        open(self.log_filename,'w').truncate()   
-
-        # 设置日志配置     
-        logging.basicConfig(level=logging.INFO, #控制台打印的日志级别
-                        filename=self.log_filename,
-                        filemode='a',##模式，有w和a，w就是写模式，每次都会重新写日志，覆盖之前的日志
-                        #a是追加模式，默认如果不写的话，就是追加模式
-                        format=
-                        '%(message)s'
-                        #日志格式
-                        )
-
-    '''
     设置钉钉消息
     '''
     def set_dingtalk(self):
@@ -116,7 +126,7 @@ class Entry(object):
         self.notifier.push(content)   
 
     '''
-    上传文件
+    上传查询的日志文件到 transfer
     '''
     def transfer_file(self):
         if self.transfer_url != '':
@@ -134,23 +144,23 @@ class Entry(object):
     def generate_domains(self):
         domains = []
         if self.domain_gen_type == 1:
-            self.domain.add_only_numbers()
+            self.domain_maker.add_only_numbers()
         elif self.domain_gen_type == 2:
-            self.domain.add_only_characters()
+            self.domain_maker.add_only_characters()
         elif self.domain_gen_type == 3:
-            self.domain.add_only_numbers()
-            domains = self.domain.make_domains()
-            self.domain.clear_all_chars()
-            self.domain.add_only_characters()
+            self.domain_maker.add_only_numbers()
+            domains = self.domain_maker.make_domains()
+            self.domain_maker.clear_all_chars()
+            self.domain_maker.add_only_characters()
         elif self.domain_gen_type == 4:
-            self.domain.add_only_numbers()
-            self.domain.add_only_characters()
+            self.domain_maker.add_only_numbers()
+            self.domain_maker.add_only_characters()
         elif self.domain_gen_type == 5:
-            self.domain.set_custom_chars(self.domain_characters)
+            self.domain_maker.set_custom_chars(self.domain_characters)
         else:
-            self.domain.add_only_numbers()
+            self.domain_maker.add_only_numbers()
 
-        domains_2 = self.domain.make_domains()
+        domains_2 = self.domain_maker.make_domains()
         domains.extend(domains_2)
         # print(domains, len(domains))
         return domains
@@ -193,7 +203,7 @@ class Entry(object):
 
         return None
 
-    def main(self):
+    def run(self):
         # return
         domains = self.filter_domains()
         # return
@@ -252,4 +262,4 @@ class Entry(object):
         
 
 if __name__ == '__main__':
-    Entry().main()
+    Finder().run()
