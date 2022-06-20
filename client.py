@@ -11,8 +11,19 @@ class Client():
         self.set_headers() 
 
         self.ip_addresses = []
+        self.proxy = False
+
+    def get_proxy_address(self, proxy = False):
+        self.proxy = proxy
         # 设置代理 IP
-        self.set_ip_proxy()            
+        if self.proxy == True:
+            client = Proxy()
+            # self.ip_addresses = self.set_ipaddress()  
+
+            # self.ip_addresses = client.get_jiangxianli() 
+            # self.ip_addresses = client.get_xiladaili()
+            self.ip_addresses = client.get_fate0() 
+            client.write_proxy(self.ip_addresses)       
 
     '''
     网页请求 cookie
@@ -46,27 +57,24 @@ class Client():
     设置 cookie
     '''
     def set_cookie(self, url):
-        self.session.headers.update({'cookie': self.get_http_cookie(url), 'referer': url})        
+        self.session.headers.update({'cookie': self.get_http_cookie(url), 'referer': url})   
 
+    '''
+    设置代理
+    '''    
+    def set_proxy(self, proxy = False):
+        self.proxy = proxy     
+        
     '''
     自定义代理 IP
     '''
     def set_ipaddress(self):
         return ['115.223.7.34:80', '27.192.200.7:9000', '113.237.3.178:9999', '181.10.129.85:8080']
 
-    def set_ip_proxy(self):
-        proxy = Proxy()
-        # self.ip_addresses = self.set_ipaddress()  
-
-        # self.ip_addresses = proxy.get_jiangxianli() 
-        # self.ip_addresses = proxy.get_xiladaili()
-        self.ip_addresses = proxy.get_fate0() 
-        proxy.write_proxy(self.ip_addresses)           
-
     '''
     代理请求
     '''
-    def proxy_request(self, url, domain, type = 'get', use_proxy = True, **kwargs):
+    def request(self, url, domain, type = 'get', **kwargs):
         times = 0
 
         while True:
@@ -74,16 +82,16 @@ class Client():
             proxies = {}
 
             try:
-                if use_proxy and proxy_len > 0:
-                    proxy = random.randint(0, proxy_len - 1)
-                    proxies = {"http": 'http://' + self.ip_addresses[proxy]}
+                if self.proxy and proxy_len > 0:
+                    proxy_idx = random.randint(0, proxy_len - 1)
+                    proxies = {"http": 'http://' + self.ip_addresses[proxy_idx]}
 
                 if type == 'get':
                     response = self.session.get(url, proxies=proxies, timeout=5, **kwargs)
                 else:
                     response = self.session.post(url, proxies=proxies, timeout=5, **kwargs)
                    
-                # print(f"Proxy currently being used: {proxy['https']}")
+                # print(f"Proxy currently being used: {proxy_idx['https']}")
                 # print(proxies)
                 
                 break

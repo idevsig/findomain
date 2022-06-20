@@ -21,6 +21,9 @@ class Finder(object):
         self.domain_start = ''
         self.domain_restart_url = ''
 
+        # 启用代理
+        self.proxy = False
+
         # 上传至
         self.transfer_url = ''
 
@@ -34,7 +37,7 @@ class Finder(object):
         self.domain_maker = Domain(self.domain_length, self.domain_characters)
 
         # 设置 WHOIS
-        self.whois = Whois(self.whois_isp)
+        self.whois_maker = Whois(self.whois_isp, self.proxy)
 
     '''
     设置日志配置
@@ -86,8 +89,14 @@ class Finder(object):
                 if len(domain_start) == self.domain_length:                
                     self.domain_start = domain_start
 
+                if 'proxy' in info:
+                    self.proxy = info['proxy'] == 1
+                else:
+                    self.proxy = False
+
             except Exception as e:
                 print(f'convert domain info err: {e}')
+                exit(1)
       
     '''
     从线上获取域名配置信息
@@ -219,7 +228,7 @@ class Finder(object):
         for character in domains:
             check_times += 1
             result = 0
-            is_registered, regdate, expdate, err = self.whois.check_registered(character, self.domain_suffixes)
+            is_registered, regdate, expdate, err = self.whois_maker.check_registered(character, self.domain_suffixes)
             # print('registered: ', is_registered, regdate, expdate, err)
 
             if err == 0:

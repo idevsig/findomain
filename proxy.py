@@ -40,9 +40,10 @@ class Proxy(object):
 
     def get_fate0(self):
         url = 'https://ghproxy.com/https://raw.githubusercontent.com/fate0/proxylist/master/proxy.list'
+        print(url)
         response = requests.get(url)
         resp_json = response.text.split('\n')
-        # print(resp_json)
+        print(resp_json)
 
         ip_pools = []
         for s in resp_json:

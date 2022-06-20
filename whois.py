@@ -1,4 +1,5 @@
 import json
+from pickle import FALSE
 import random
 from enum import Enum
 
@@ -11,8 +12,10 @@ class ISP(Enum):
 
 class Whois(object):
 
-    def __init__(self, isp = 'west'):
+    def __init__(self, isp = 'west', proxy = False):
         self.session = Client()
+        self.session.get_proxy_address(proxy)
+
         self.isp = isp
 
         self.character = ''
@@ -44,7 +47,8 @@ class Whois(object):
             return self.qcloud(domain) 
         elif self.isp == 'zzidc':
             return self.zzidc(domain)
-
+        elif self.isp == 'westxyz':
+            return self.west_search(domain)
         return self.west(domain)    
 
     '''
@@ -55,7 +59,7 @@ class Whois(object):
         url = 'https://qcwss.cloud.tencent.com/domain/ajax/newdomain?action=CheckDomainAvailable&from=domain_buy'    
 
         self.session.set_cookie(referer_url)
-        response = self.session.proxy_request(url, domain, type = 'post', data = {'DomainName': domain})
+        response = self.session.request(url, domain, type = 'post', data = {'DomainName': domain})
         registered, regdate, expdate, err = True, '', '', 0
 
         try:
@@ -78,28 +82,78 @@ class Whois(object):
         referer_url = '{}/web/whois/whois'.format(isp_url)
         # https://www.west.xyz/en/domain/whois.asp
         url = '{}/web/whois/whoisinfo?domain={}&server=&refresh=0'.format(isp_url, domain)
-        # print(url, msg.text)
+        print(url)
 
         self.session.set_cookie(referer_url)
 
-        response = self.session.proxy_request(url, domain)
-        registered, regdate, expdate, err = True, '', '', 0
+        response = self.session.request(url, domain)
+        registered, regdate, expdate, err = True, '', '', 1
 
         try:
+            print(response.text)
             resp = self.__json_check(response)  
 
-            registered = resp['regdate'] != None
-            regdate = resp['regdate']
-            expdate = resp['expdate']
+            if resp['code'] == 200 or resp['code'] == 100:
+                registered = resp['regdate'] != ''
+                
+                if registered:
+                    regdate = resp['regdate']
+                    expdate = resp['expdate']
 
-            if regdate == None:
-                regdate = ''
-                expdate = ''
+                err = 0
         except Exception as e:
             print(f'Error: {isp_url} find domain: {domain}, err:{e}') 
-            err = 1
 
         return registered, regdate, expdate, err    
+
+    '''
+    西部数码(search)
+    '''
+    def west_search(self, domain):
+        req_urls = ['https://www.west.xyz']
+        # isp_idx = random.randint(0, len(req_urls) - 1)
+        isp_url = req_urls[0]
+        # https://www.west.xyz/main/domain_do.asp
+        url = '{}/main/domain_do.asp'.format(isp_url)
+        referer_url = url
+
+        self.session.set_cookie(referer_url)
+
+        domains = domain.split('.')
+        
+        data = {
+            "act": "query",
+            "domains": domains[0],
+            "suffixs": "." + domains[1]
+            }
+
+        response = self.session.request(url, domain, type = 'post', data = data)
+        registered, regdate, expdate, err = True, '', '', 1
+        # str = "200 ok,a:cxf.pw||9|no|dompw;b:;c:;d:"
+        # str = "200 ok,a:fdsafdsafads.com||61|no|domcom;b:;c:;d:"
+        # str = "200 ok,a:;b:fei.pw;c:;d:"
+        # 200 ok,a:;b:;c:;d:fei.top=4153     
+        # print(url)
+
+        try:
+            print(response.text)
+            str = response.text
+            res1 = str.split(',')
+
+            if res1[0] == '200 ok':
+                res2 = res1[1].split(';')
+                
+                if res2[0] != 'a:':
+                    res3 = res2[0].split('|')
+
+                    if res3[3] == 'no':
+                        registered = False
+                        
+                err = 0
+        except Exception as e:
+            print(f'Error: {isp_url} find domain: {domain}, err:{e}') 
+
+        return registered, regdate, expdate, err  
 
     '''
     Bulk WHOIS (rapidapi)
@@ -115,7 +169,7 @@ class Whois(object):
             'x-rapidapi-key': "e7cc80a32emsh3af8115155e1edcp11b416jsnbe22a2f028d0"
             }
 
-        response = self.session.proxy_request(url, domain, headers=headers, type = 'get', use_proxy = False, params=querystring)
+        response = self.session.request(url, domain, headers=headers, type = 'get', params=querystring)
         print(response.text)
         registered, regdate, expdate, err = True, '', '', 0
 
@@ -143,7 +197,7 @@ class Whois(object):
         # print(isp_url)
 
         self.session.set_cookie(referer_url)
-        response = self.session.proxy_request(url, domain, type = 'post', data = {'domain': domain})
+        response = self.session.request(url, domain, type = 'post', data = {'domain': domain})
         registered, regdate, expdate, err = True, '', '', 0
 
         try:
