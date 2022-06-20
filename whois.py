@@ -82,7 +82,7 @@ class Whois(object):
         referer_url = '{}/web/whois/whois'.format(isp_url)
         # https://www.west.xyz/en/domain/whois.asp
         url = '{}/web/whois/whoisinfo?domain={}&server=&refresh=0'.format(isp_url, domain)
-        print(url)
+        # print(url)
 
         self.session.set_cookie(referer_url)
 
@@ -90,7 +90,7 @@ class Whois(object):
         registered, regdate, expdate, err = True, '', '', 1
 
         try:
-            print(response.text)
+            # print(response.text)
             resp = self.__json_check(response)  
 
             if resp['code'] == 200 or resp['code'] == 100:
