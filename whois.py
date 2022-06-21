@@ -133,10 +133,11 @@ class Whois(object):
         # str = "200 ok,a:fdsafdsafads.com||61|no|domcom;b:;c:;d:"
         # str = "200 ok,a:;b:fei.pw;c:;d:"
         # 200 ok,a:;b:;c:;d:fei.top=4153     
+        # str = "200 ok,a:;b:;c:;d:"
         # print(url)
 
         try:
-            print(response.text)
+            # print(response.text)
             str = response.text
             res1 = str.split(',')
 
@@ -148,8 +149,11 @@ class Whois(object):
 
                     if res3[3] == 'no':
                         registered = False
-                        
-                err = 0
+                
+                if res2[0] == 'a:' and res2[1] == 'b:':
+                    err = 1
+                else:     
+                    err = 0
         except Exception as e:
             print(f'Error: {isp_url} find domain: {domain}, err:{e}') 
 
