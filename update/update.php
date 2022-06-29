@@ -7,7 +7,7 @@ $domain_arr = json_decode($domain, true);
 
 $data = $_POST['domain'] ?? '';
 
-if (strlen($data) === $domain_arr['length']) {
+if (strlen($data) === $domain_arr['length'] || $data === '-') {
     $domain_arr['start'] = $data;
     
     file_put_contents($file_name, json_encode($domain_arr));
