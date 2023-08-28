@@ -8,9 +8,9 @@ on:
   push:
     # branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   # schedule:
-  #   - cron: '0 */3 * * *'    
+  #   - cron: '0 */3 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: "3.10.12"
 
       # Runs a set of commands using the runners shell
       - name: Install requirements
@@ -35,8 +35,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Working
-        env:
-          DINGTALK_ROBOT_SECRET: ${{ secrets.DINGTALK_ROBOT_SECRET}}
-          DINGTALK_ROBOT_TOKEN: ${{ secrets.DINGTALK_ROBOT_TOKEN}}
-          DOMAIN_URL: ${{ secrets.DOMAIN_URL}}
-        run: python find.py
+        run: python run.py

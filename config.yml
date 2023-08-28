@@ -1,18 +1,3 @@
-# findomain
-
-查询域名是否已被注册
-
-## TODOS
-
-- 代理 IP 功能
-- 多线程
-- 断点查询
-
-## 配置信息
-
-[config.yml](config.yml)
-
-```yaml
 # 设置
 setting:
   # 域名信息获取网址，断点查询使用
@@ -54,7 +39,7 @@ whois:
 # 通知
 notify:
   # 启用
-  enable: dingtalk, feishu
+  enable: ""
 
   # 钉钉
   dingtalk:
@@ -68,4 +53,3 @@ notify:
     token: ""
     # 飞书 Secret
     secret: ""
-```
