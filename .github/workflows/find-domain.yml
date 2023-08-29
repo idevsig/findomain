@@ -35,4 +35,6 @@ jobs:
           pip install -r requirements.txt
 
       - name: Working
+        env:
+          YAML_URL: ${{ secrets.YAML_URL}}
         run: python run.py

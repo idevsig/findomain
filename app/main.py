@@ -1,6 +1,8 @@
+import json
 import logging
-from datetime import datetime
+import os
 import random
+from datetime import datetime
 from config.config_loader import load_config
 from .utils.request import HttpRequest
 from .notify.feishu import Feishu
@@ -14,9 +16,9 @@ from .whois.zzidc import Zzidc
 
 
 class App:
-    def __init__(self, config='config.yml') -> None:
+    def __init__(self, cfg_path='config.yml') -> None:
 
-        config = load_config(config)
+        config = self.config(cfg_path)
 
         # 需查询的域名列表
         self.domains = []
@@ -54,6 +56,7 @@ class App:
             'suffix': '',
         }
         self.domain = {**default_domain, **config.get('domain', {})}
+        self.domain_from_url(self.setting['url'])
         self.generator(self.domain)
 
         default_notify_secret = {'token': '1', 'secret': '2'}
@@ -69,9 +72,32 @@ class App:
 
         setting = config['setting']
         whois = config['whois']
-
         print("Setting:", setting)
         print("Whois:", whois)
+
+        print("Domain:", self.domain)
+        print("Notify:", self.notify)
+        print("\n")
+
+    '''
+    从服务器获取 config.yml 配置信息
+    '''
+
+    def config(self, file_path):
+        url = os.environ.get('YAML_URL')
+        if url:
+            try:
+                req = HttpRequest()
+                response = req.get(url)
+                if response.status_code == 200:
+                    with open(file_path, 'wb') as file:
+                        file.write(response.content)
+                else:
+                    raise ValueError(f'status code {response.status_code}')
+            except Exception as e:
+                print(f'Get yaml from url {url}, {e}')
+
+        return load_config(file_path)
 
     '''
     设置日志配置
@@ -95,6 +121,37 @@ class App:
         )
 
     '''
+    从线上获取域名配置信息
+    {
+        "suffixes": "cn",
+        "length": 3,
+        "mode": 2,
+        "alphabets": "",
+        "start_char": "",
+        "prefix": "",
+        "suffix": ""
+    }
+    '''
+
+    def domain_from_url(self, url):
+        if not url:
+            return None
+
+        try:
+            req = HttpRequest()
+            response = req.get(url)
+
+            # 获取失败
+            if response.status_code != 200:
+                raise ValueError(f'status code {response.status_code}')
+
+            # 更新域名信息
+            self.domain.update(json.loads(response.text))
+        except Exception as e:
+            print(f'Get domain info from url {url} failed: {e}.')
+            return None
+
+    '''
     初始化 ISP
     '''
 
@@ -104,7 +161,7 @@ class App:
             West(),
             Qcloud(),
             Zzidc(),
-            Rapidapi()
+            # Rapidapi()
         ]
 
         # 自定义 ISP 商
@@ -263,10 +320,12 @@ class App:
                     count += 1  # 增加成功数
                     break
                 except Exception as e:
-                    print(f'transfer_file err: {e}')
                     retries += 1  # 增加重试次数
+                    print(
+                        f'Fetch domain info err: {e}, retries: {retries}')
                     if retries >= max_retries:
-                        print("Max retries reached. Exiting loop.")
+                        print(
+                            f'Max retries reached fetch domain {domain} info, exiting loop.')
                         should_break = True  # 设置标志以跳出最外层的for循环
                         break  # 达到最大重试次数，退出循环
                     continue
@@ -277,10 +336,6 @@ class App:
             die('Failed to retrieve valid domain data.')
 
     def run(self):
-        print("Domain:", self.domain)
-        print("Notify:", self.notify)
-        print("\n")
-
         # print(self.domains)
         self.fetch()
 

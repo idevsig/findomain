@@ -1,6 +1,6 @@
 # 设置
 setting:
-  # 域名信息获取网址，断点查询使用
+  # 域名信息获取网址，断点查询使用，即 domain 项
   url: ""
   # 查询结果保存网址
   # 具体 https://github.com/dutchcoders/transfer.sh 搭建的站点
@@ -33,7 +33,7 @@ whois:
   # 使用代理
   proxy: false
   # 默认 Whois 提供商
-  # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安,rapidapi.限制特别多
+  # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
   # 比如: west,qcloud,zzidc
   isp: west
 

@@ -71,18 +71,19 @@ class West(Whois):
         try:
             # print(response.text)
             if response.status_code != 200:
-                raise ValueError(f'status code is: {response.status_code}')
+                raise ValueError(f'status code {response.status_code}')
 
             resp = json_check(response)
 
             if resp['code'] == 200 or resp['code'] == 100:
                 available = resp['regdate'] == ''
-
                 if not available:
                     regdate = resp['regdate']
                     expdate = resp['expdate']
-
-            err = 0
+                # 返回码
+                err = 0
+            else:
+                raise ValueError(f'resp code {resp["code"]}')
         except Exception as e:
             print(f'Error: {self.name} find domain: {domain}, err:{e}')
 
