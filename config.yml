@@ -33,7 +33,8 @@ whois:
   # 使用代理
   proxy: false
   # 默认 Whois 提供商
-  # west.西部数码，westxyz.西部数据(仅判断是否已注册),qcloud.腾讯云，zzidc.郑州景安
+  # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安,rapidapi.限制特别多
+  # 比如: west,qcloud,zzidc
   isp: west
 
 # 通知
