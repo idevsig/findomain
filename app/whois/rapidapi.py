@@ -60,7 +60,7 @@ class Rapidapi(Whois):
         }
         req = HttpRequest()
         req.update_headers(headers)
-        return req.get(url, params=querystring)
+        return req.get(url, params=querystring).response
 
     '''
     是否可注册

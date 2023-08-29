@@ -43,8 +43,7 @@ class West(Whois):
     '''
 
     def requrl(self, domain):
-        isp_idx = random.randint(0, len(self.weburls) - 1)
-        isp_url = self.weburls[isp_idx]
+        isp_url = random.choice(self.weburls)
 
         referer_url = '{}/web/whois/whois'.format(isp_url)
         # https://www.west.xyz/en/domain/whois.asp
@@ -57,7 +56,7 @@ class West(Whois):
     '''
 
     def fetch(self, url):
-        return HttpRequest().get(url)
+        return HttpRequest().get(url).response
 
     '''
     是否可注册

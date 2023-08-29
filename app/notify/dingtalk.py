@@ -62,11 +62,11 @@ class Dingtalk(Notify):
         req.update_headers(headers)
 
         data = '{"msgtype": "text","text": {"content":"' + message + '"}}'
-        response = req.post(req_url, data=data.encode('utf-8'))
+        req.post(req_url, data=data.encode('utf-8'))
 
         # print(self.token, self.secret)
         print(message)
         print(req_url)
         # print(response)
-        print(response.json())
-        return response
+        print(req.json)
+        return req.response

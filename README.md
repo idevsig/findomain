@@ -8,14 +8,31 @@
 - 多线程
 - 断点查询
 
+## 运行
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 更新配置文件 config.yml
+
+# 运行
+python run.py
+
+# 或者 从网络读取配置信息
+YAML_URL=http://0.0.0.0:8000/config.yml python run.py
+```
+
 ## 配置信息
+
+> 设置环境变量 `YAML_URL` 后，可以从该网址获取配置文件，并保存覆盖到 `config.yml`。
 
 [config.yml](config.yml)
 
 ```yaml
 # 设置
 setting:
-  # 域名信息获取网址，断点查询使用
+  # 域名信息获取网址，断点查询使用，即 domain 项
   url: ""
   # 查询结果保存网址
   # 具体 https://github.com/dutchcoders/transfer.sh 搭建的站点
@@ -48,13 +65,14 @@ whois:
   # 使用代理
   proxy: false
   # 默认 Whois 提供商
-  # west.西部数码，westxyz.西部数据(仅判断是否已注册),qcloud.腾讯云，zzidc.郑州景安
-  isp: west
+  # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
+  # 比如: west,qcloud,zzidc
+  isp:
 
 # 通知
 notify:
   # 启用
-  enable: dingtalk, feishu
+  enable: ""
 
   # 钉钉
   dingtalk:

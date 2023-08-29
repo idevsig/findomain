@@ -1,5 +1,3 @@
-import random
-
 from ..utils.helpers import json_check
 from ..utils.request import HttpRequest
 from .whois import Whois
@@ -51,7 +49,7 @@ class Qcloud(Whois):
     '''
 
     def fetch(self, url, domain):
-        return HttpRequest().post(url, data={'DomainName': domain})
+        return HttpRequest().post(url, data={'DomainName': domain}).response
 
     '''
     是否可注册

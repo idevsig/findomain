@@ -35,7 +35,7 @@ whois:
   # 默认 Whois 提供商
   # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
   # 比如: west,qcloud,zzidc
-  isp: west
+  isp:
 
 # 通知
 notify:

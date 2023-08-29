@@ -69,12 +69,11 @@ class Feishu(Notify):
             }
         }
         data = json.dumps(data, indent=4)
-
-        response = req.post(req_url, data=data.encode('utf-8'))
+        req.post(req_url, data=data.encode('utf-8'))
 
         # print(self.token, self.secret)
         print(message)
         print(req_url)
         # print(response)
-        print(response.json())
-        return response
+        print(req.json)
+        return req.response

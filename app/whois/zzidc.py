@@ -49,8 +49,7 @@ class Zzidc(Whois):
     '''
 
     def requrl(self):
-        isp_idx = random.randint(0, len(self.weburls) - 1)
-        isp_url = self.weburls[isp_idx]
+        isp_url = random.choice(self.weburls)
 
         referer_url = 'https://www.zzidc.com'
         req_url = '{}/domain/checkDomain'.format(
@@ -62,7 +61,7 @@ class Zzidc(Whois):
     '''
 
     def fetch(self, url, domain):
-        return HttpRequest().post(url, data={'domain': domain})
+        return HttpRequest().post(url, data={'domain': domain}).response
 
     '''
     是否可注册

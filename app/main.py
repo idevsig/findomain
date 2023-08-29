@@ -4,6 +4,9 @@ import os
 import random
 from datetime import datetime
 from config.config_loader import load_config
+from .proxy.fate0 import Fate0
+from .proxy.zdaye import Zdaye
+from .proxy.ip66 import Ip66
 from .utils.request import HttpRequest
 from .notify.feishu import Feishu
 from .notify.dingtalk import Dingtalk
@@ -70,6 +73,10 @@ class App:
         # 初始化 ISP
         self.init_isp()
 
+        # 初始化 Proxy
+        self.init_proxy()
+        die('test')
+
         setting = config['setting']
         whois = config['whois']
         print("Setting:", setting)
@@ -88,12 +95,12 @@ class App:
         if url:
             try:
                 req = HttpRequest()
-                response = req.get(url)
-                if response.status_code == 200:
+                req.get(url)
+                if req.response.status_code == 200:
                     with open(file_path, 'wb') as file:
-                        file.write(response.content)
+                        file.write(req.content)
                 else:
-                    raise ValueError(f'status code {response.status_code}')
+                    raise ValueError(f'status code {req.response.status_code}')
             except Exception as e:
                 print(f'Get yaml from url {url}, {e}')
 
@@ -139,14 +146,14 @@ class App:
 
         try:
             req = HttpRequest()
-            response = req.get(url)
+            req.get(url)
 
             # 获取失败
-            if response.status_code != 200:
-                raise ValueError(f'status code {response.status_code}')
+            if req.response.status_code != 200:
+                raise ValueError(f'status code {req.response.status_code}')
 
             # 更新域名信息
-            self.domain.update(json.loads(response.text))
+            self.domain.update(json.loads(req.text))
         except Exception as e:
             print(f'Get domain info from url {url} failed: {e}.')
             return None
@@ -157,7 +164,7 @@ class App:
 
     def init_isp(self):
         # 全部
-        self.isps = [
+        self.isp_list = [
             West(),
             Qcloud(),
             Zzidc(),
@@ -172,7 +179,7 @@ class App:
             # 配置中的 ISPS 遍历
             for name in arr:
                 # ISPS 遍历
-                for isp in self.isps:
+                for isp in self.isp_list:
                     # ISP 名转小写
                     isp_name = str(isp.__class__.__name__).lower()
                     # 匹配名称
@@ -188,11 +195,31 @@ class App:
                         break
             # 若存在自定义 ISP，则更新
             if len(isps) > 0:
-                self.isps = isps
+                self.isp_list = isps
 
         # 获取 ISP 数量
-        self.isp_count = len(self.isps)
+        self.isp_count = len(self.isp_list)
 
+    '''
+    初始化 Proxy
+    '''
+
+    def init_proxy(self):
+        print(self.whois)
+        if self.whois['proxy']:
+            proxys = [
+                # Fate0(),
+                # Zdaye(), // 有防火墙
+                # Ip66(),
+            ]
+            list = []
+            # 遍历代理服务获取数据
+            for p in proxys:
+                print(p.__class__.__name__)
+                # 生成列表
+                p.generate()
+                print(p.list, len(p.list))
+                list.append(p.list)
     '''
     生成域名列表
     '''
@@ -271,26 +298,22 @@ class App:
         if self.setting['transfer']:
             try:
                 req = HttpRequest()
-                response = req.post(
+                req.post(
                     self.setting['transfer'], files={'file': open(log_path, 'rb')})
 
-                if response.status_code != 200:
+                if req.response.status_code != 200:
                     raise ValueError(
-                        f'{response.text}, status code {response.status_code}')
+                        f'{req.text}, status code {req.response.status_code}')
 
                 # print(f'transfer_file: {response.text}')
-                return response.text
+                return req.text
             except Exception as e:
                 print(f'transfer_file err: {e}')
                 return None
 
     '''
-    随机 ISP
+    抓取 whois 数据
     '''
-
-    def random_isp(self):
-        idx = random.randint(0, len(self.isps) - 1)
-        return self.isps[idx]
 
     def fetch(self):
         count = 0
@@ -303,7 +326,7 @@ class App:
 
             while retries < max_retries:
                 try:
-                    isp = self.random_isp()
+                    isp = random.choice(self.isp_list)
                     isp_name = isp.__class__.__name__
                     available, regdate, expdate, err = isp.available(domain)
 
