@@ -1,32 +1,30 @@
 import random
-
 from ..utils.helpers import json_check
 from ..utils.request import HttpRequest
 from .whois import Whois
 
-'''
-西部数码
-'''
-
 
 class West(Whois):
     '''
-    初始化
+    西部数码
     '''
 
     def __init__(self):
         self.name = self.__class__.__name__
 
-        self.weburls = ['https://www.west.xyz',
-                        'https://www.363.hk', 'https://west.cn']
+        self.weburls = [
+            'https://www.west.xyz',
+            'https://www.363.hk',
+            'https://west.cn',
+        ]
 
         self.suffixes = []
 
-    '''
-    是否支持该后缀
-    '''
-
     def supported(self, suffixes):
+        '''
+        是否支持该后缀
+        :param suffixes: 后缀
+        '''
         if not self.suffixes:
             return True
 
@@ -38,11 +36,11 @@ class West(Whois):
                 f'Error: ({self.name}) this suffix is not supported: {suffixes}')
             return False
 
-    '''
-    生成请求的 URL
-    '''
-
     def requrl(self, domain):
+        '''
+        生成请求的 URL
+        :param domain: 域名
+        '''
         isp_url = random.choice(self.weburls)
 
         referer_url = '{}/web/whois/whois'.format(isp_url)
@@ -51,18 +49,18 @@ class West(Whois):
             isp_url, domain)
         return req_url
 
-    '''
-    请求数据
-    '''
-
     def fetch(self, url):
+        '''
+        请求数据
+        :param url: 网址
+        '''
         return HttpRequest().get(url).response
 
-    '''
-    是否可注册
-    '''
-
     def available(self, domain):
+        '''
+        是否可注册
+        :param domain: 域名
+        '''
         req_url = self.requrl(domain)
         response = self.fetch(req_url)
 

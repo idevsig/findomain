@@ -1,17 +1,12 @@
 import random
 import re
-
 from ..utils.request import HttpRequest
 from .whois import Whois
-
-'''
-景安网络
-'''
 
 
 class Zzidc(Whois):
     '''
-    初始化
+    景安网络
     '''
 
     def __init__(self):
@@ -31,11 +26,11 @@ class Zzidc(Whois):
         ]
         pass
 
-    '''
-    是否支持该后缀
-    '''
-
     def supported(self, suffixes):
+        '''
+        是否支持该后缀
+        :param suffixes: 后缀
+        '''
         try:
             self.suffixes.index(suffixes)
             return True
@@ -44,11 +39,10 @@ class Zzidc(Whois):
                 f'Error: ({self.name}) this suffix is not supported: {suffixes}')
             return False
 
-    '''
-    生成请求的 URL
-    '''
-
     def requrl(self):
+        '''
+        生成请求的 URL
+        '''
         isp_url = random.choice(self.weburls)
 
         referer_url = 'https://www.zzidc.com'
@@ -56,18 +50,18 @@ class Zzidc(Whois):
             isp_url)
         return req_url
 
-    '''
-    请求数据
-    '''
-
     def fetch(self, url, domain):
+        '''
+        请求数据
+        :param url: 网址
+        '''
         return HttpRequest().post(url, data={'domain': domain}).response
 
-    '''
-    是否可注册
-    '''
-
     def available(self, domain):
+        '''
+        是否可注册
+        :param domain: 域名
+        '''
         req_url = self.requrl()
         response = self.fetch(req_url, domain)
 

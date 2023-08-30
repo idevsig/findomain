@@ -4,16 +4,12 @@ from ..utils.helpers import json_check
 from ..utils.request import HttpRequest
 from .whois import Whois
 
-'''
-Rapidapi
-https://rapidapi.com/backend_box/api/bulk-whois/
-33 / day | Hard Limit
-'''
-
 
 class Rapidapi(Whois):
     '''
-    初始化
+    Rapidapi
+    https://rapidapi.com/backend_box/api/bulk-whois/
+    33 / day | Hard Limit
     '''
 
     def __init__(self):
@@ -23,11 +19,11 @@ class Rapidapi(Whois):
 
         self.suffixes = []
 
-    '''
-    是否支持该后缀
-    '''
-
     def supported(self, suffixes):
+        '''
+        是否支持该后缀
+        :param suffixes: 后缀
+        '''
         if not self.suffixes:
             return True
 
@@ -39,20 +35,20 @@ class Rapidapi(Whois):
                 f'Error: ({self.name}) this suffix is not supported: {suffixes}')
             return False
 
-    '''
-    生成请求的 URL
-    '''
-
     def requrl(self):
+        '''
+        生成请求的 URL
+        '''
         req_url = '{}/whois'.format(
             self.weburl)
         return req_url
 
-    '''
-    请求数据
-    '''
-
     def fetch(self, url, domain):
+        '''
+        请求数据
+        :param url: 网址
+        :param domain: 域名
+        '''
         querystring = {"domains": domain, "format": "split"}
         headers = {
             'x-rapidapi-host': "pointsdb-bulk-whois-v1.p.rapidapi.com",
@@ -62,11 +58,11 @@ class Rapidapi(Whois):
         req.update_headers(headers)
         return req.get(url, params=querystring).response
 
-    '''
-    是否可注册
-    '''
-
     def available(self, domain):
+        '''
+        是否可注册
+        :param domain: 域名
+        '''
         req_url = self.requrl()
         response = self.fetch(req_url, domain)
 

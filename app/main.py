@@ -77,18 +77,14 @@ class App:
         # 初始化 ISP
         self.init_isp()
 
-        # 初始化 Proxy
-        self.init_proxy()
-        # die('test')
+        # 初始化 Proxy（未启用，停止开发）
+        # self.init_proxy()
 
-        setting = config['setting']
-        whois = config['whois']
-        print("Setting:", setting)
-        print("Whois:", whois)
-
-        print("Domain:", self.domain)
-        print("Notify:", self.notify)
-        print("\n")
+        # print("Setting:", self.setting)
+        # print("Whois:", self.whois)
+        # print("Domain:", self.domain)
+        # print("Notify:", self.notify)
+        # print("\n")
 
     def config(self, file_path):
         '''
@@ -153,6 +149,7 @@ class App:
             return None
         try:
             req = HttpRequest()
+            req.update_headers({})
             req.get(url)
 
             # 获取失败
@@ -162,8 +159,7 @@ class App:
             # 更新域名信息
             self.domain.update(json.loads(req.text))
         except Exception as e:
-            print(f'Get domain info from url {url} failed: {e}.')
-            return None
+            die(f'Get domain info from url {url} failed: {e}.')
 
     def init_isp(self):
         '''

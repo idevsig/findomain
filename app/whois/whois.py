@@ -1,36 +1,34 @@
 from abc import ABC, abstractmethod
 
-'''
-Whois
-'''
-
 
 class Whois(ABC):
-
     '''
-    是否支持该后缀
+    Whois
     '''
     @abstractmethod
     def supported(self, suffixes):
+        '''
+        是否支持该后缀
+        '''
         pass
 
-    '''
-    生成请求 URL
-    '''
     @abstractmethod
     def requrl(self):
+        '''
+        生成请求 URL
+        '''
         pass
 
-    '''
-    请求数据
-    '''
     @abstractmethod
     def fetch(self):
+        '''
+        请求数据
+        '''
         pass
 
-    '''
-    是否可注册
-    '''
     @abstractmethod
     def available(self, domain):
+        '''
+        是否可注册
+        '''
         pass

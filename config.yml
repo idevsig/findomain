@@ -32,7 +32,7 @@ domain:
 
 # Whois
 whois:
-  # 使用代理
+  # 使用代理（功能未实现）
   proxy: false
   # 默认 Whois 提供商
   # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
