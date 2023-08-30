@@ -398,7 +398,7 @@ class App:
             die('Failed to retrieve valid domain data.')
 
     def run(self):
-        # print(self.domains)
+        # die(len(self.domains))
         self.fetch()
 
         log_path = self.setting['log_path']
