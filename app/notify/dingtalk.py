@@ -7,12 +7,12 @@ from urllib import parse
 from ..utils.request import HttpRequest
 from .notify import Notify
 
-'''
-钉钉通知
-'''
-
 
 class Dingtalk(Notify):
+    '''
+    钉钉通知
+    '''
+
     def __init__(self, token='', secret=''):
         self.token = token
         self.secret = secret

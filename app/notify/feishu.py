@@ -8,12 +8,12 @@ from urllib import parse
 from ..utils.request import HttpRequest
 from .notify import Notify
 
-'''
-飞书通知
-'''
-
 
 class Feishu(Notify):
+    '''
+    飞书通知
+    '''
+
     def __init__(self, token='', secret=''):
         self.token = token
         self.secret = secret

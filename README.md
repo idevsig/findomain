@@ -2,11 +2,6 @@
 
 查询域名是否已被注册
 
-## TODOS
-
-- ~~代理 IP 功能~~（停止开发。数据池好用的）
-- ~~多线程~~（停止开发。不支持断点查询，可能会拖垮相关网站）
-
 ## 运行
 
 ```bash
@@ -22,9 +17,12 @@ python run.py
 YAML_URL=http://0.0.0.0:8000/config.yml python run.py
 ```
 
-## 配置信息
+## 配置
 
-> 设置环境变量 `YAML_URL` 后，可以从该网址获取配置文件，并保存覆盖到 `config.yml`。
+设置环境变量 `YAML_URL` 后，可以从该网址获取配置文件，并保存覆盖到 `config.yml`。
+
+<details>
+<summary>查看 config.yml 配置信息</summary>
 
 [config.yml](config.yml)
 
@@ -44,52 +42,80 @@ setting:
   max_retries: 3
 
 # 域名
+
 domain:
-  # 后缀
-  suffixes: cn
-  # 长度
-  length: 3
-  # 组合模式
-  # 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
-  mode: 3
-  # 自定义组合字母表
-  alphabets: ""
-  # 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
-  start_char: ""
-  # 组合前缀
-  prefix: ""
-  # 组合后缀
-  suffix: ""
+
+# 后缀
+
+suffixes: cn
+
+# 长度
+
+length: 3
+
+# 组合模式
+
+# 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
+
+mode: 3
+
+# 自定义组合字母表
+
+alphabets: ""
+
+# 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
+
+start_char: ""
+
+# 组合前缀
+
+prefix: ""
+
+# 组合后缀
+
+suffix: ""
 
 # Whois
+
 whois:
-  # 使用代理
-  proxy: false
-  # 默认 Whois 提供商
-  # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
-  # 比如: west,qcloud,zzidc
-  isp:
+
+# 使用代理
+
+proxy: false
+
+# 默认 Whois 提供商
+
+# west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
+
+# 比如: west,qcloud,zzidc
+
+isp:
 
 # 通知
-notify:
-  # 启用
-  enable: ""
 
-  # 钉钉
-  dingtalk:
-    # 钉钉 access_token
-    token: ""
-    # 钉钉 Secret
-    secret: ""
-  # 飞书
-  feishu:
-    # 飞书 Token
-    token: ""
-    # 飞书 Secret
-    secret: ""
+notify:
+
+# 启用
+
+enable: ""
+
+# 钉钉
+
+dingtalk: # 钉钉 access_token
+token: "" # 钉钉 Secret
+secret: ""
+
+# 飞书
+
+feishu: # 飞书 Token
+token: "" # 飞书 Secret
+secret: ""
+
 ```
 
-域名信息获取的内容为
+</details>
+
+**设置 `setting.url`** 后，该网址返回的数据信息
 
 ```json
 {
