@@ -9,6 +9,8 @@ setting:
   data_path: domain.txt
   # 日志文件
   log_path: domain.log
+  # 最大查询次数
+  max_retries: 3
 
 # 域名
 domain:

@@ -10,7 +10,7 @@ from .proxy.ip66 import Ip66
 from .utils.request import HttpRequest
 from .notify.feishu import Feishu
 from .notify.dingtalk import Dingtalk
-from .utils.helpers import die
+from .utils.helpers import die, write_file
 from .utils.domain import Domain
 from .whois.west import West
 from .whois.qcloud import Qcloud
@@ -25,6 +25,8 @@ class App:
 
         # 需查询的域名列表
         self.domains = []
+        # 查询失败的域名
+        self.failed_domain = ''
 
         # 当前日期
         current_date = datetime.now().strftime("%Y%m%d")
@@ -36,6 +38,7 @@ class App:
 
             'data_path': 'domain.txt',
             'log_path': 'domain.log',
+            'max_retries': 3,
         }
         self.setting = {**default_setting, **config.get('setting', {})}
         self.setting['log_path'] = f'{current_date}_{self.setting["log_path"]}'
@@ -57,12 +60,13 @@ class App:
             'start_char': '',
             'prefix': '',
             'suffix': '',
+            'done': 0,
         }
         self.domain = {**default_domain, **config.get('domain', {})}
         self.domain_from_url(self.setting['url'])
         self.generator(self.domain)
 
-        default_notify_secret = {'token': '1', 'secret': '2'}
+        default_notify_secret = {'token': '', 'secret': ''}
         default_notify = {
             'enable': '',
             'dingtalk': default_notify_secret,
@@ -75,7 +79,7 @@ class App:
 
         # 初始化 Proxy
         self.init_proxy()
-        die('test')
+        # die('test')
 
         setting = config['setting']
         whois = config['whois']
@@ -86,11 +90,11 @@ class App:
         print("Notify:", self.notify)
         print("\n")
 
-    '''
-    从服务器获取 config.yml 配置信息
-    '''
-
     def config(self, file_path):
+        '''
+        从服务器获取 config.yml 配置信息
+        :param file_path: 配置文件地址
+        '''
         url = os.environ.get('YAML_URL')
         if url:
             try:
@@ -106,11 +110,14 @@ class App:
 
         return load_config(file_path)
 
-    '''
-    设置日志配置
-    '''
-
     def setlog(self, logpath):
+        '''
+        设置日志配置
+        :param logpath: 日志文件地址
+        '''
+        if not logpath:
+            return
+
         # 清空文件
         open(logpath, 'w').truncate()
 
@@ -127,23 +134,23 @@ class App:
             format='%(message)s'
         )
 
-    '''
-    从线上获取域名配置信息
-    {
-        "suffixes": "cn",
-        "length": 3,
-        "mode": 2,
-        "alphabets": "",
-        "start_char": "",
-        "prefix": "",
-        "suffix": ""
-    }
-    '''
-
     def domain_from_url(self, url):
+        '''
+        从线上获取域名配置信息
+        {
+            "suffixes": "cn",
+            "length": 3,
+            "mode": 2,
+            "alphabets": "",
+            "start_char": "",
+            "prefix": "",
+            "suffix": "",
+            "done": 0,
+        }
+        :param url: 域名信息网址
+        '''
         if not url:
             return None
-
         try:
             req = HttpRequest()
             req.get(url)
@@ -158,11 +165,10 @@ class App:
             print(f'Get domain info from url {url} failed: {e}.')
             return None
 
-    '''
-    初始化 ISP
-    '''
-
     def init_isp(self):
+        '''
+        初始化 ISP
+        '''
         # 全部
         self.isp_list = [
             West(),
@@ -200,11 +206,10 @@ class App:
         # 获取 ISP 数量
         self.isp_count = len(self.isp_list)
 
-    '''
-    初始化 Proxy
-    '''
-
     def init_proxy(self):
+        '''
+        初始化 Proxy
+        '''
         print(self.whois)
         if self.whois['proxy']:
             proxys = [
@@ -220,35 +225,30 @@ class App:
                 p.generate()
                 print(p.list, len(p.list))
                 list.append(p.list)
-    '''
-    生成域名列表
-    '''
 
     def generator(self, domain):
+        '''
+        生成域名列表
+        :param domain: 域名信息
+        '''
+        # 域名已全部查询完成
+        if self.domain['done'] == 1:
+            die('Domain query complete.')
+
         domains = Domain(domain).maker()
 
         if len(domains) == 0:
             die('No domain available for querying.')
 
         domain_strings = "\n".join(domains)
-        self.write_file(self.setting['data_path'], domain_strings)
-
+        write_file(self.setting['data_path'], domain_strings)
         self.domains = domains
-        pass
-
-    '''
-    数据写入文件
-    '''
-
-    def write_file(self, file_path, str):
-        with open(file_path, "w") as file:
-            file.write(str)
-
-    '''
-    推送通知
-    '''
 
     def push(self, message):
+        '''
+        推送通知
+        :param message: 消息内容
+        '''
         if not self.notify['enable']:
             return
 
@@ -273,11 +273,34 @@ class App:
         except Exception as e:
             print(f'Sending message failed: {e}')
 
-    '''
-    读取日志
-    '''
+    def transfer_file(self, log_path):
+        '''
+        上传日志文件到 transfer
+        :param log_path: 日志文件路径
+        '''
+        if not self.setting['transfer']:
+            return False
+        try:
+            req = HttpRequest()
+            req.post(
+                self.setting['transfer'], files={'file': open(log_path, 'rb')})
 
-    def read_log(self, log_path, url=''):
+            if req.response.status_code != 200:
+                raise ValueError(
+                    f'{req.text}, status code {req.response.status_code}')
+
+            # print(f'transfer_file: {response.text}')
+            return req.text
+        except Exception as e:
+            print(f'transfer_file err: {e}')
+            return None
+
+    def domain_log(self, log_path, url=''):
+        '''
+        读取域名结果
+        :param log_path: 域名结果文件路径
+        :param url: transfer 文件保存路径
+        '''
         content = open(log_path, 'r').read()
         print('''
 ----------------------Domain List------------------------
@@ -290,38 +313,50 @@ class App:
             content = url
         return content
 
-    '''
-    上传日志文件到 transfer
-    '''
+    def domain_resume(self, domain):
+        '''
+        断点查询，更新域名信息到服务器
+        :param domain: 域名，含后缀
+        '''
+        if not self.setting['url']:
+            return
+        try:
+            start_char = ''
+            done = 0 if domain else 1
+            if done == 0:
+                # 取域名，去除后缀，更新至断点续查服务器
+                parts = domain.split(".")
+                start_char = parts[0]
 
-    def transfer_file(self, log_path):
-        if self.setting['transfer']:
-            try:
-                req = HttpRequest()
-                req.post(
-                    self.setting['transfer'], files={'file': open(log_path, 'rb')})
-
-                if req.response.status_code != 200:
-                    raise ValueError(
-                        f'{req.text}, status code {req.response.status_code}')
-
-                # print(f'transfer_file: {response.text}')
-                return req.text
-            except Exception as e:
-                print(f'transfer_file err: {e}')
-                return None
-
-    '''
-    抓取 whois 数据
-    '''
+            data = {
+                'suffixes': self.domain['suffixes'],
+                'length': self.domain['length'],
+                'mode': self.domain['mode'],
+                'alphabets': self.domain['alphabets'],
+                'start_char': start_char,
+                'prefix': self.domain['prefix'],
+                'suffix': self.domain['suffix'],
+                'done': done,
+            }
+            data = json.dumps(data, indent=4)
+            req = HttpRequest()
+            req.post(self.setting['url'], data.encode('utf-8'))
+            print(f'Update domain info: {req.text}')
+        except Exception as e:
+            print(f'Update domain info failed.')
 
     def fetch(self):
-        count = 0
+        '''
+        抓取 whois 数据
+        '''
+        count = 0  # 成功查询次数
+        max_retries = 3  # 最多重试3次
+        if 'max_retries' in self.setting and isinstance(self.setting['max_retries'], int) and self.setting['max_retries'] >= 3:
+            max_retries = self.setting['max_retries']
 
         for domain in self.domains:
             # print(domain)
             retries = 0  # 重试次数计数器
-            max_retries = 10  # 最多重试10次
             should_break = False  # 标志，用于控制是否跳出最外层的for循环
 
             while retries < max_retries:
@@ -331,30 +366,38 @@ class App:
                     available, regdate, expdate, err = isp.available(domain)
 
                     # 打印日志
-                    print(f'{domain}, {available}, {regdate}, {expdate}, {err}')
+                    dlog = f'{domain}, {1 if available else 0 }, {err}, {regdate}, {expdate}'
+                    print(dlog)
 
                     # whois 查询失败
                     if err != 0:
                         raise ValueError(
                             f'{isp_name} fetch domain {domain} failed.')
 
-                    logging.info(
-                        f'{domain}, {1 if available else 0 }, {err}, {regdate}, {expdate}')
-                    count += 1  # 增加成功数
+                    # 写入域名结果文件
+                    logging.info(dlog)
+                    # 增加成功数
+                    count += 1
+                    # should_break = True  # denug
                     break
                 except Exception as e:
-                    retries += 1  # 增加重试次数
+                    # 增加重试次数
+                    retries += 1
                     print(
                         f'Fetch domain info err: {e}, retries: {retries}')
                     if retries >= max_retries:
                         print(
                             f'Max retries reached fetch domain {domain} info, exiting loop.')
-                        should_break = True  # 设置标志以跳出最外层的for循环
+                        # 设置标志以跳出最外层的for循环
+                        should_break = True
                         break  # 达到最大重试次数，退出循环
                     continue
 
+            # 如果标志被设置，跳出最外层的for循环
             if should_break:
-                break  # 如果标志被设置，跳出最外层的for循环
+                self.failed_domain = domain
+                break
+
         if count == 0:
             die('Failed to retrieve valid domain data.')
 
@@ -364,5 +407,6 @@ class App:
 
         log_path = self.setting['log_path']
         transfer_url = self.transfer_file(log_path)
-        message = self.read_log(log_path, transfer_url)
+        message = self.domain_log(log_path, transfer_url)
         self.push(message)
+        self.domain_resume(self.failed_domain)

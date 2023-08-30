@@ -5,8 +5,7 @@
 ## TODOS
 
 - 代理 IP 功能
-- 多线程
-- 断点查询
+- 多线程（不支持断点查询）
 
 ## 运行
 
@@ -41,6 +40,8 @@ setting:
   data_path: domain.txt
   # 日志文件
   log_path: domain.log
+  # 最大查询次数
+  max_retries: 3
 
 # 域名
 domain:
@@ -87,3 +88,20 @@ notify:
     # 飞书 Secret
     secret: ""
 ```
+
+域名信息获取的内容为
+
+```json
+{
+  "suffixes": "cn",
+  "length": 3,
+  "mode": 2,
+  "alphabets": "",
+  "start_char": "",
+  "prefix": "",
+  "suffix": "",
+  "done": 0
+}
+```
+
+> done: 1.已查询完成（避免重复查询）

@@ -17,11 +17,10 @@ class Dingtalk(Notify):
         self.token = token
         self.secret = secret
 
-    '''
-    签名
-    '''
-
     def signature(self):
+        '''
+        签名
+        '''
         timestamp = str(round(time.time() * 1000))
         secret_enc = self.secret.encode('utf-8')
         string_to_sign = '{}\n{}'.format(timestamp, self.secret)
@@ -33,19 +32,19 @@ class Dingtalk(Notify):
         # print(sign)
         return (timestamp, sign)
 
-    '''
-    生成请求的 URL
-    '''
-
     def requrl(self, sign):
+        '''
+        生成请求的 URL
+        :param sign: 签名
+        '''
         return 'https://oapi.dingtalk.com/robot/send?access_token={}{}'.format(
             self.token, sign)
 
-    '''
-    发送通知
-    '''
-
     def send(self, message):
+        '''
+        发送通知
+        :param message: 消息内容
+        '''
         if not self.token or not self.secret:
             print(f'未检测到 "钉钉机器人"')
             return
@@ -65,8 +64,8 @@ class Dingtalk(Notify):
         req.post(req_url, data=data.encode('utf-8'))
 
         # print(self.token, self.secret)
-        print(message)
-        print(req_url)
+        # print(message)
+        # print(req_url)
         # print(response)
         print(req.json)
         return req.response

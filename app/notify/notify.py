@@ -7,16 +7,17 @@ Notify 推送通知
 
 class Notify(ABC):
 
-    '''
-    签名
-    '''
     @abstractmethod
     def signature(self):
+        '''
+        签名
+        '''
         pass
 
-    '''
-    发送通知
-    '''
     @abstractmethod
     def send(self, message):
+        '''
+        发送通知
+        :param message: 消息内容
+        '''
         pass
