@@ -17,7 +17,7 @@ domain:
   # 后缀
   suffixes: cn
   # 长度
-  length: 3
+  length: 1
   # 组合模式
   # 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
   # 6.杂米（不含纯数字和字母），7.杂米，自定义字符
@@ -30,6 +30,8 @@ domain:
   prefix: ""
   # 组合后缀
   suffix: ""
+  # 是否已完成
+  done: 1
 
 # Whois
 whois:

@@ -5,12 +5,19 @@ name: "GitHub Actions Find Domain"
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the main branch
 on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: "Domain"
+        default: ""
+
   push:
     # branches: [ main ]
-  pull_request:
-    branches: [main]
   # schedule:
   #   - cron: "*/40 * * * *"
+
+env:
+  DOMAIN: ${{ github.event.inputs.domain }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,4 +40,13 @@ jobs:
       - name: Working
         env:
           YAML_URL: ${{ secrets.YAML_URL}}
-        run: python run.py
+        run: python main.py
+
+      - name: Upload Domain Log
+        uses: actions/upload-artifact@v3
+        with:
+          name: find-domain artifact
+          path: |
+            domain.txt
+            *_domain.log
+          retention-days: 3

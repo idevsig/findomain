@@ -2,10 +2,6 @@
 
 查询域名是否已被注册
 
-- https://git.jetsung.com/idev/findomain
-- https://framagit.org/idev/findomain
-- https://github.com/idev-sig/findomain
-
 ## 运行
 
 ```bash
@@ -15,10 +11,13 @@ pip install -r requirements.txt
 # 更新配置文件 config.yml
 
 # 运行
-python run.py
+python main.py
 
 # 或者 从网络读取配置信息
-YAML_URL=http://0.0.0.0:8000/config.yml python run.py
+YAML_URL=http://0.0.0.0:8000/config.yml python main.py
+
+# 指定域名
+DOMAIN=x.com python main.py
 ```
 
 ## 配置
@@ -47,55 +46,51 @@ setting:
 
 # 域名
 domain:
-
-# 后缀
-suffixes: cn
-
-# 长度
-length: 3
-
-# 组合模式
-# 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
-mode: 3
-
-# 自定义组合字母表
-alphabets: ""
-
-# 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
-start_char: ""
-
-# 组合前缀
-prefix: ""
-
-# 组合后缀
-suffix: ""
+  # 后缀
+  suffixes: cn
+  # 长度
+  length: 1
+  # 组合模式
+  # 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
+  # 6.杂米（不含纯数字和字母），7.杂米，自定义字符
+  mode: 3
+  # 自定义组合字母表
+  alphabets: ""
+  # 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
+  start_char: ""
+  # 组合前缀
+  prefix: ""
+  # 组合后缀
+  suffix: ""
+  # 是否已完成
+  done: 1
 
 # Whois
 whois:
-
-# 使用代理
-proxy: false
-
-# 默认 Whois 提供商
-# west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
-# 比如: west,qcloud,zzidc
-isp:
+  # 使用代理（功能未实现）
+  proxy: false
+  # 默认 Whois 提供商
+  # west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
+  # 比如: west,qcloud,zzidc
+  isp:
 
 # 通知
 notify:
+  # 启用
+  enable: ""
 
-# 启用
-enable: ""
-
-# 钉钉
-dingtalk: # 钉钉 access_token
-token: "" # 钉钉 Secret
-secret: ""
-
-# 飞书
-feishu: # 飞书 Token
-token: "" # 飞书 Secret
-secret: ""
+  # 钉钉
+  dingtalk:
+    # 钉钉 access_token
+    token: ""
+    # 钉钉 Secret
+    secret: ""
+  # 飞书
+  feishu:
+    # 飞书 Token
+    token: ""
+    # 飞书 Secret
+    secret: ""
 ```
 
 </details>
@@ -116,3 +111,9 @@ secret: ""
 ```
 
 > done: 1.已查询完成（避免重复查询）
+
+## 仓库镜像
+
+- https://git.jetsung.com/idev/findomain
+- https://framagit.org/idev/findomain
+- https://github.com/idev-sig/findomain

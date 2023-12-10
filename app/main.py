@@ -63,8 +63,14 @@ class App:
             'done': 0,
         }
         self.domain = {**default_domain, **config.get('domain', {})}
-        self.domain_from_url(self.setting['url'])
-        self.generator(self.domain)
+
+        custom_domain=os.environ.get('DOMAIN')
+        if not custom_domain:
+            self.domain_from_url(self.setting['url'])
+            self.generator(self.domain)
+        else:
+            self.domains = [custom_domain]
+            self.domain['done'] = 0
 
         default_notify_secret = {'token': '', 'secret': ''}
         default_notify = {
