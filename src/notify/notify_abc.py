@@ -5,12 +5,19 @@ Notify 推送通知
 '''
 
 
-class Notify(ABC):
+class NotifyABC(ABC):
+
+    @property
+    def provider_name(self) -> str:
+        """
+        Returns the name of the notification provider.
+        """
+        return self.__class__.__name__
 
     @abstractmethod
-    def signature(self):
+    def _build_url(self) -> str:
         '''
-        签名
+        构建请求 URL
         '''
         pass
 

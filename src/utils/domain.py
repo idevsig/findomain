@@ -1,65 +1,67 @@
 import itertools
-from .helpers import die
 
+from type.enum import Mode
 
 class Domain:
     '''
     域名生成器
+    {'suffixes': 'cn', 'length': 3, 'mode': 2, 'characters': '', 'start_char': '', 'prefix': '', 'suffix': ''} 
     '''
-    # {'suffixes': 'cn', 'length': 3, 'mode': 2, 'characters': '', 'start_char': '', 'prefix': '', 'suffix': ''} 1
+
+    DOMAIN_SUFFIX_MIN_LENGTH = 2
+    DOMAIN_LENGTH_MIN = 1
 
     def __init__(self, domain) -> None:
-        self.verify(domain)
-
-        self.suffixes = domain['suffixes']
-        self.length = domain['length']
-        self.mode = domain['mode']
-        self.alphabets = domain['alphabets']
-        self.start_char = domain['start_char']
-        self.prefix = domain['prefix']
-        self.suffix = domain['suffix']
-
         # 默认组合字符
         self.domain_characters = ''
 
-    def verify(self, domain):
+        self.suffixes = domain.suffixes
+        self.length = domain.length
+        self.mode = domain.mode
+        self.alphabets = domain.alphabets
+        self.start_char = domain.start_char
+        self.prefix = domain.prefix
+        self.suffix = domain.suffix
+
+    def verify(self):
         '''
         校验域名信息合法性
         '''
         # 校验
-        if len(domain['suffixes']) < 2:
-            die(f"Invalid domain suffixes: {domain['suffixes']}")
+        if len(self.suffixes) < self.DOMAIN_SUFFIX_MIN_LENGTH:
+            raise ValueError(f"Invalid domain suffixes: {self.suffixes}")
 
-        if domain['length'] < 0:
-            die(f"Invalid domain length: {domain['length']}")
+        if self.length < self.DOMAIN_LENGTH_MIN:
+            raise ValueError(f"Invalid domain length: {self.length}")
 
-        if domain['start_char']:
-            domain_length = domain['length'] + \
-                len(domain['prefix']) + len(domain['suffix'])
-            if len(domain['start_char']) != domain_length:
-                die(
-                    f"Invalid start char length: {domain_length}, start_char: {domain['start_char']}")
+        if self.start_char:
+            domain_length = self.length + len(self.prefix) + len(self.suffix)
+
+            if len(self.start_char) != domain_length:
+                raise ValueError(f"Invalid start char length: {domain_length}, start_char: {self.start_char}")
 
     def maker(self):
         '''
         生成组合数据
         '''
+        self.verify()
+
         domains = []  # 域名列表
-        if self.mode == 1:  # 纯数字
+        if self.mode == Mode.PureNumbers.value:  # 纯数字
             self.add_only_numbers()
-        elif self.mode == 2:  # 纯字母
+        elif self.mode == Mode.PureLetters.value:  # 纯字母
             self.add_only_characters()
-        elif self.mode == 3:  # 纯数字 + 纯字母
+        elif self.mode == Mode.NumbersAndLetters.value:  # 纯数字 + 纯字母
             self.add_only_numbers()
             # 生成纯数字
             domains = self.generate()
             # 清空所有字符
             self.clear_all_chars()
             self.add_only_characters()
-        elif self.mode == 4 or self.mode == 6:  # 数字+字母
+        elif self.mode == Mode.MixedNumbersAndLetters.value or self.mode == Mode.MixedNoPure.value:  # 数字+字母
             self.add_only_numbers()
             self.add_only_characters()
-        elif self.mode == 5 or self.mode == 7:  # 自定义字符
+        elif self.mode == Mode.CustomCharacters.value or self.mode == Mode.MixedWithCustom.value:  # 自定义字符
             self.set_custom_chars(self.alphabets)
         else:  # 纯数字
             self.add_only_numbers()
@@ -122,6 +124,8 @@ class Domain:
         设置为自定义字符
         '''
         self.domain_characters = chars
+        if not self.domain_characters:
+            raise ValueError('Custom characters cannot be empty.')
 
     def clear_all_chars(self):
         '''
@@ -154,11 +158,9 @@ class Domain:
         '''
         域名添加前后缀
         '''
-        if self.mode == 6 or self.mode == 7:
+        if self.mode == Mode.MixedNoPure.value or self.mode == Mode.MixedWithCustom.value:
             gen_combinations = self.generate_number_char()
         else:
             gen_combinations = self.generate_list()
 
-        domains = [
-            f"{self.prefix}{''.join(combination)}{self.suffix}" for combination in gen_combinations]
-        return domains
+        return [f"{self.prefix}{''.join(combination)}{self.suffix}" for combination in gen_combinations]

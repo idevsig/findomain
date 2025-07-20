@@ -1,7 +1,19 @@
-.vscode
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
 
-**/__pycache__
+# Virtual environments
+.venv
+
+# IDE-specific files
+.idea/
+.vscode/
+.marscode/
+
+# log
+logs/
 *.log
-*.txt
-
-config.dev.yml
