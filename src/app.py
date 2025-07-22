@@ -322,6 +322,11 @@ class App:
         return upload_info
 
     def run(self, custom_domain=None):
+        # 简单判断域名是否合法
+        if custom_domain and "." not in custom_domain:
+            logging.error(f"Invalid domain: {custom_domain}")
+            return
+
         logging.debug(self.config.json())
 
         try:

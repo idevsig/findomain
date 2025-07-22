@@ -77,10 +77,6 @@ def main():
     )
 
     domain = args.domain or os.environ.get("FD_DOMAIN")
-    # 简单判断域名是否合法
-    if domain and "." not in domain:
-        raise ValueError(f"Invalid domain: {domain}")
-
     App(config).run(domain)
 
 
