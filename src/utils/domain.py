@@ -3,6 +3,7 @@ from __future__ import annotations
 import itertools
 
 from type.enum import Mode
+from utils.util import remove_special_chars, remove_suffix
 
 
 class Domain:
@@ -15,6 +16,8 @@ class Domain:
     DOMAIN_LENGTH_MIN = 1
 
     def __init__(self, domain) -> None:
+        # 移除后缀且保留英文大小写和数字
+        start_char = remove_special_chars(remove_suffix(domain.start_char))
         # 默认组合字符
         self.domain_characters = ""
 
@@ -22,7 +25,8 @@ class Domain:
         self.length = domain.length
         self.mode = domain.mode
         self.alphabets = domain.alphabets
-        self.start_char = domain.start_char
+
+        self.start_char = start_char
         self.prefix = domain.prefix
         self.suffix = domain.suffix
 
