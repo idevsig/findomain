@@ -19,7 +19,7 @@ class West(WhoisABC):
         self.base_urls = [
             'https://www.west.xyz',
             'https://www.363.hk',
-            'https://west.cn',
+            'https://www.west.cn',
         ]
         # self.enable = False
 
@@ -56,14 +56,17 @@ class West(WhoisABC):
             error_code=1,
             provider=self.provider_name,
         )
-        response = self.fetch(self._make_request_url(domain))
-        logging.debug(f'{self.provider_name}, {response.text}')
+        # response = self.fetch(self._make_request_url(domain))
+        response = self.fetch(
+            'https://fileserver.zzzzy.com/public/findomain_test_noba.json'
+        )
         try:
             # print(response.text)
             if response.status_code != 200:
                 raise ValueError(f'status code {response.status_code}')
 
             resp = response.json()
+            logging.debug(f'{self.provider_name}, {resp}')
             # code 为 200 时，表示已被注册
             # code 为 100 时，表示未被注册或注册局保留
             # 保险起见，使用注册日期字段判断是否已被注册
