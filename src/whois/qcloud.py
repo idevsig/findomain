@@ -74,8 +74,8 @@ class Qcloud(WhoisABC):
             provider=self.provider_name,
         )
         response = self.fetch(self._make_request_url(), domain)
-        logging.debug(f'{self.provider_name}, {response.text}')
         try:
+            logging.debug(f'{self.provider_name}, {response.text}')
             if response.status_code != 200:
                 raise ValueError(f'status code is: {response.status_code}')
 

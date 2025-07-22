@@ -62,11 +62,11 @@ class West(WhoisABC):
         )
         try:
             # print(response.text)
+            logging.debug(f'{self.provider_name}, {response.text}')
             if response.status_code != 200:
                 raise ValueError(f'status code {response.status_code}')
 
             resp = response.json()
-            logging.debug(f'{self.provider_name}, {resp}')
             # code 为 200 时，表示已被注册
             # code 为 100 时，表示未被注册或注册局保留
             # 保险起见，使用注册日期字段判断是否已被注册
