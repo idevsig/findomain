@@ -251,6 +251,22 @@ class Config:
         """Return a detailed string representation of the Config object."""
         return self.__str__()
 
+    def json(self) -> str:
+        """Return a JSON representation of the Config object."""
+        import json
+        config_dict = {
+            "setting": vars(self.setting),
+            "domain": vars(self.domain),
+            "whois": vars(self.whois),
+            "notify": {
+                "providers": self.notify.providers,
+                "dingtalk": vars(self.notify.dingtalk),
+                "feishu": vars(self.notify.feishu),
+                "lark": vars(self.notify.lark)
+            }
+        }
+        return json.dumps(config_dict, indent=2)
+
 
 # Example usage:
 # config = Config()

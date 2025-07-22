@@ -6,6 +6,7 @@ import os
 from app import App
 from config import Config
 from logger import setup_logging
+from utils.util import remove_suffix
 
 
 def arguments():
@@ -60,7 +61,7 @@ def load_config(args):
     if os.environ.get("FD_LOG_LEVEL"):
         config.setting.log_level = os.environ.get("FD_LOG_LEVEL")
     if os.environ.get("FD_START_CHAR"):
-        config.domain.start_char = os.environ.get("FD_START_CHAR").split('.')[0]
+        config.domain.start_char = remove_suffix(os.environ.get("FD_START_CHAR"))
     return config
 
 
@@ -76,6 +77,10 @@ def main():
     )
 
     domain = args.domain or os.environ.get("FD_DOMAIN")
+    # 简单判断域名是否合法
+    if domain and "." not in domain:
+        raise ValueError(f"Invalid domain: {domain}")
+
     App(config).run(domain)
 
 

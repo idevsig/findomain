@@ -322,7 +322,7 @@ class App:
         return upload_info
 
     def run(self, custom_domain=None):
-        logging.debug(self.config)
+        logging.debug(self.config.json())
 
         try:
             self.prepare(custom_domain).fetch()

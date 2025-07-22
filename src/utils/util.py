@@ -6,6 +6,18 @@ from urllib.parse import urlparse
 from urllib.parse import urlunparse
 
 
+def remove_suffix(url: str) -> str:
+    """
+    去除字符串中的后缀
+    """
+    return url.split(".")[0]
+
+def remove_special_chars(text: str) -> str:
+    """
+    去除字符串中的特殊字符
+    """
+    return re.sub(r'[^a-zA-Z0-9]', '', text)
+
 def is_valid_url(url: str) -> bool:
     """
     检查 URL 是否合法
