@@ -19,7 +19,7 @@ class Domain:
         # 移除后缀且保留英文大小写和数字
         start_char = remove_special_chars(remove_suffix(domain.start_char))
         # 默认组合字符
-        self.domain_characters = ""
+        self.domain_characters = ''
 
         self.suffixes = domain.suffixes
         self.length = domain.length
@@ -36,17 +36,17 @@ class Domain:
         """
         # 校验
         if len(self.suffixes) < self.DOMAIN_SUFFIX_MIN_LENGTH:
-            raise ValueError(f"Invalid domain suffixes: {self.suffixes}")
+            raise ValueError(f'Invalid domain suffixes: {self.suffixes}')
 
         if self.length < self.DOMAIN_LENGTH_MIN:
-            raise ValueError(f"Invalid domain length: {self.length}")
+            raise ValueError(f'Invalid domain length: {self.length}')
 
         if self.start_char:
             domain_length = self.length + len(self.prefix) + len(self.suffix)
 
             if len(self.start_char) != domain_length:
                 raise ValueError(
-                    f"Invalid start char length: {domain_length}, start_char: {self.start_char}",
+                    f'Invalid start char length: {domain_length}, start_char: {self.start_char}',
                 )
 
     def maker(self):
@@ -106,26 +106,26 @@ class Domain:
         """
         添加域名后缀
         """
-        domains = [f"{''.join(domain)}.{self.suffixes}" for domain in domains]
+        domains = [f'{"".join(domain)}.{self.suffixes}' for domain in domains]
         return domains
 
     def gen_only_alphabet(self):
         """
         生成 a-z 的字符串
         """
-        return "".join(chr(i) for i in range(97, 123))
+        return ''.join(chr(i) for i in range(97, 123))
 
     def gen_only_number(self, min=0, max=9):
         """
         生成 0-9 的数字
         """
-        return "".join(str(i) for i in range(min, max + 1))
+        return ''.join(str(i) for i in range(min, max + 1))
 
     def add_only_numbers(self):
         """
         添加纯数字
         """
-        self.domain_characters += "0123456789"
+        self.domain_characters += '0123456789'
 
     def add_only_characters(self):
         """
@@ -139,13 +139,13 @@ class Domain:
         """
         self.domain_characters = chars
         if not self.domain_characters:
-            raise ValueError("Custom characters cannot be empty.")
+            raise ValueError('Custom characters cannot be empty.')
 
     def clear_all_chars(self):
         """
         清空字符
         """
-        self.domain_characters = ""
+        self.domain_characters = ''
 
     def generate_list(self):
         """
@@ -161,12 +161,12 @@ class Domain:
 
         list = self.generate_list()
         for chars in list:
-            combination = "".join(chars)
+            combination = ''.join(chars)
 
             if (
                 any(char.isdigit() for char in combination)
                 and any(char.isalpha() for char in combination)
-                and "-" not in combination
+                and '-' not in combination
             ):
                 combinations.append(combination)
 
@@ -185,6 +185,6 @@ class Domain:
             gen_combinations = self.generate_list()
 
         return [
-            f"{self.prefix}{''.join(combination)}{self.suffix}"
+            f'{self.prefix}{"".join(combination)}{self.suffix}'
             for combination in gen_combinations
         ]

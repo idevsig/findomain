@@ -24,7 +24,7 @@ def set_log_level(level: int | str):
 
 def setup_logging(
     name: str,
-    dir_path: str = "logs",
+    dir_path: str = 'logs',
     level: int = logging.INFO,
 ):
     """配置日志记录"""
@@ -33,7 +33,7 @@ def setup_logging(
 
     logging.basicConfig(
         level=set_log_level(level),
-        format="%(asctime)s - %(levelname)s - %(message)s",
+        format='%(asctime)s - %(levelname)s - %(message)s',
         # format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.FileHandler(os.path.join(dir_path, name)),

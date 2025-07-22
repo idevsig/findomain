@@ -17,12 +17,12 @@ class Dingtalk(NotifyABC):
     钉钉通知推送类，支持带签名的加密消息发送
     """
 
-    def __init__(self, token: str = "", secret: str = ""):
+    def __init__(self, token: str = '', secret: str = ''):
         self.token = token
         self.secret = secret
         self._http = HttpRequest().update_headers(
             {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
         )
 
@@ -32,22 +32,22 @@ class Dingtalk(NotifyABC):
         :return: (timestamp, signature)
         """
         timestamp = str(round(time.time() * 1000))
-        string_to_sign = f"{timestamp}\n{self.secret}"
+        string_to_sign = f'{timestamp}\n{self.secret}'
         hmac_code = hmac.new(
-            self.secret.encode("utf-8"),
-            string_to_sign.encode("utf-8"),
+            self.secret.encode('utf-8'),
+            string_to_sign.encode('utf-8'),
             digestmod=hashlib.sha256,
         ).digest()
         signature = quote_plus(base64.b64encode(hmac_code))
         return timestamp, signature
 
-    def _build_url(self, timestamp: str = "", sign: str = "") -> str:
+    def _build_url(self, timestamp: str = '', sign: str = '') -> str:
         """
         构建完整请求 URL
         """
         return (
-            f"https://oapi.dingtalk.com/robot/send?"
-            f"access_token={self.token}&timestamp={timestamp}&sign={sign}"
+            f'https://oapi.dingtalk.com/robot/send?'
+            f'access_token={self.token}&timestamp={timestamp}&sign={sign}'
         )
 
     def send(self, message: str):
@@ -57,25 +57,25 @@ class Dingtalk(NotifyABC):
         """
         if not self.token or not self.secret:
             logging.warning(
-                f"{self.provider_name} 机器人 token 或 secret 未配置，取消发送。",
+                f'{self.provider_name} 机器人 token 或 secret 未配置，取消发送。',
             )
             return
 
-        logging.info(f"准备通过 - {self.provider_name} 机器人 - 推送消息...")
+        logging.info(f'准备通过 - {self.provider_name} 机器人 - 推送消息...')
 
         try:
             timestamp, sign = self._generate_signature()
             url = self._build_url(timestamp, sign)
             payload = {
-                "msgtype": "text",
-                "text": {
-                    "content": message,
+                'msgtype': 'text',
+                'text': {
+                    'content': message,
                 },
             }
 
             self._http.post(url, json=payload)
-            logging.info(f"{self.provider_name} 消息发送成功")
+            logging.info(f'{self.provider_name} 消息发送成功')
             return self._http.response
 
         except Exception as e:
-            logging.error(f"{self.provider_name} 消息发送失败", exc_info=e)
+            logging.error(f'{self.provider_name} 消息发送失败', exc_info=e)

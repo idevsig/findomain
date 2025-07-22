@@ -20,3 +20,6 @@ package = true
 [tool.ruff]
 line-length = 79
 fix = true
+
+[tool.ruff.format]
+quote-style = "single"
