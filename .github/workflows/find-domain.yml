@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production 
     env:
+      TZ: Asia/Shanghai
       FD_CONFIG_JSON: ${{ secrets.CONFIG_JSON }}
       FD_DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
       FD_DOMAIN: ${{ secrets.DOMAIN }}
