@@ -46,6 +46,7 @@ uv run findomain -d idev.top
 
 - 可配置环境变量 `FD_CONFIG_JSON` 作为全局的值（内容格式参考 [`config.json5`](config.json5)）
 - 设置环境变量 `FD_DOMAIN_URL` 后，可以从该网址获取域名部分的配置信息，并覆盖本地的配置信息。
+- 设置环境变量 `FD_LOG_LEVEL` 后，可指定日志级别，如 `FD_LOG_LEVEL=debug`
 
 <details>
 <summary>查看配置信息</summary>
@@ -187,12 +188,12 @@ options:
                         Server auth for uploading query results
   -p, --dnp DNP         Whois providers, eg: west, qcloud, zzidc
 ```
-> -c 指定配置文件路径，如 config.toml 或 config.json5
-> -d 查询单个域名，如 idev.top。可通过环境变量设置 `FD_DOMAIN`
-> -u 从网络获取域名(`domain`)部分信息，如 http://0.0.0.0:8000/domain_info.json , 可通过环境变量 `FD_DOMAIN_URL` 设置
-> -s 上传查询结果的服务器地址，可通过环境变量 `FD_SERVER_URL` 设置。含 `@` 则会替换成日期 `yyyyMMdd`
-> -a 上传查询结果的服务器鉴权信息，可通过环境变量 `FD_SERVER_AUTH` 设置
-> -p 指定 Whois 提供商，可通过环境变量 `FD_DNP` 设置
+> -c 指定配置文件路径，如 config.toml 或 config.json5   
+> -d 查询单个域名，如 idev.top。可通过环境变量设置 `FD_DOMAIN`   
+> -u 从网络获取域名(`domain`)部分信息，如 http://0.0.0.0:8000/domain_info.json , 可通过环境变量 `FD_DOMAIN_URL` 设置   
+> -s 上传查询结果的服务器地址，可通过环境变量 `FD_SERVER_URL` 设置。含 `@` 则会替换成日期 `yyyyMMdd`   
+> -a 上传查询结果的服务器鉴权信息，可通过环境变量 `FD_SERVER_AUTH` 设置   
+> -p 指定 Whois 提供商，可通过环境变量 `FD_DNP` 设置   
 
 ## 仓库镜像
 

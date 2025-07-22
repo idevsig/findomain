@@ -20,7 +20,6 @@ class Zzidc(WhoisABC):
             "https://www.zzidc.com",
             # 'https://www.zzidc.hk',
         ]
-        self.base_url = random.choice(self.base_urls)
         self.supported_suffixes = [
             "net",
             "com",
@@ -49,6 +48,7 @@ class Zzidc(WhoisABC):
         查询域名
         :param domain: 域名
         """
+        self.base_url = random.choice(self.base_urls)
         self._is_service_available()
 
         result = QueryResult(

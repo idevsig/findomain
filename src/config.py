@@ -49,14 +49,14 @@ class Domain:
 
     def __init__(self):
         # Domain suffixes
-        self.suffixes = "cn"
+        self.suffixes = "com"
         # Domain length
         self.length = 1
         # Combination mode
         # 1: Pure numbers, 2: Pure letters, 3: Numbers + Letters,
         # 4: Mixed numbers and letters, 5: Custom characters
         # 6: Mixed (no pure numbers or letters), 7: Mixed with custom characters
-        self.mode = 3
+        self.mode = 5
         # Custom character set for combinations
         self.alphabets = ""
         # Starting domain (included in query, must match length)

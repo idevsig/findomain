@@ -20,7 +20,6 @@ class West(WhoisABC):
             "https://www.363.hk",
             "https://west.cn",
         ]
-        self.base_url = random.choice(self.base_urls)
         # self.enable = False
 
     def _make_request_url(self, domain):
@@ -42,6 +41,7 @@ class West(WhoisABC):
         查询域名
         :param domain: 域名
         """
+        self.base_url = random.choice(self.base_urls)
         self._is_service_available()
 
         result = QueryResult(
@@ -76,7 +76,7 @@ class West(WhoisABC):
                 )
         except Exception as e:
             raise ValueError(
-                f"Error: {self.name} find domain: {domain}, err:{e}",
+                f"find domain: {domain}, err:{e}",
             )
 
         return result

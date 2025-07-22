@@ -19,6 +19,7 @@ class WhoisABC(ABC):
     def __init__(self):
         # 在类的实例化时，将 _enable 默认设置为 True
         self._enable: bool = True
+        self._base_url: str = ""
 
     @property
     def provider_name(self) -> str:
@@ -117,17 +118,23 @@ class WhoisABC(ABC):
                 f"An unexpected error occurred during service availability check: {e}",
             )
 
-    def supported(self, suffix):
+    def supported(self, suffix, strict=True) -> bool:
         """
-        是否支持该后缀
-        :param suffix: 后缀
+        判断是否支持该后缀
+        :param suffix: 后缀字符串
+        :param strict: 如果为 True，则不支持时报错；否则返回 False
         """
-        try:
-            (self.supported_suffixes.index(suffix) if self.supported_suffixes else True)
-        except Exception:
+        if not self.supported_suffixes:
+            return True
+        
+        if suffix in self.supported_suffixes:
+            return True
+        
+        if strict:
             raise ValueError(
-                f"Error: ({self.provider_name}) this suffix is not supported: {suffix}",
+                f"Error: ({self.provider_name}) this suffix is not supported: {suffix}"
             )
+        return False
 
     @abstractmethod
     def _make_request_url(self) -> str:

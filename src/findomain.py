@@ -49,8 +49,6 @@ def load_config(args):
         config.whois.dnp = args.dnp.replace(" ", "")
 
     # 从环境变量中加载配置
-    if os.environ.get("FD_CONFIG"):
-        config.load_from_file(os.environ.get("FD_CONFIG"))
     if os.environ.get("FD_DOMAIN_URL"):
         config.setting.url = os.environ.get("FD_DOMAIN_URL")
     if os.environ.get("FD_SERVER_URL"):
@@ -59,27 +57,26 @@ def load_config(args):
         config.setting.server_auth = os.environ.get("FD_SERVER_AUTH")
     if os.environ.get("FD_DNP"):
         config.whois.dnp = os.environ.get("FD_DNP").replace(" ", "")
+    if os.environ.get("FD_LOG_LEVEL"):
+        config.setting.log_level = os.environ.get("FD_LOG_LEVEL")
+    if os.environ.get("FD_START_CHAR"):
+        config.domain.start_char = os.environ.get("FD_START_CHAR").split('.')[0]
     return config
 
 
 def main():
     args = arguments()
-    if args.domain:
-        domain = args.domain
-    else:
-        domain = os.environ.get("FD_DOMAIN")
-
     config = load_config(args)
 
     # datetime.now().strftime("%Y%m%d")
-    print(config)
     setup_logging(
         config.setting.log_file,
         config.setting.log_dir,
         config.setting.log_level,
     )
 
-    App(config, domain).run()
+    domain = args.domain or os.environ.get("FD_DOMAIN")
+    App(config).run(domain)
 
 
 if __name__ == "__main__":

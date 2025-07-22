@@ -21,15 +21,13 @@ from whois.zzidc import Zzidc
 
 
 class App:
-    def __init__(self, config, custom_domain=None) -> None:
+    def __init__(self, config) -> None:
         self.config = config
 
         # 需查询的域名列表
         self.domains: list[str] = []
         # 最后一次查询失败的域名
         self.last_failed_domain = ""
-        # 自定义域名
-        self.custom_domain = custom_domain
         # 域名提供商列表
         self.dnp_list: list[WhoisABC] = []
         # 域名提供商数量
@@ -42,16 +40,15 @@ class App:
         )
         self.result_file = os.path.join(self.config.setting.log_dir, file_name)
 
-    def prepare(self):
+    def prepare(self, custom_domain=None):
         # 从环境变量中获取自定义域名
-        if self.custom_domain:
-            self.domains = [self.custom_domain]
+        if custom_domain:
+            self.domains = [custom_domain]
             self.config.domain.done = Query.NotDone.value
         elif self.config.setting.url:
             self.domain_from_url(self.config.setting.url)
-            self.generator()
         else:
-            raise ValueError("No domain to query.")
+            self.generator()
 
         self.__load_DNP()
         return self
@@ -94,7 +91,6 @@ class App:
         if self.config.whois.dnp:
             arr = str(self.config.whois.dnp).replace(" ", "").split(",")
             self.filter_dnps(arr)
-
         # 域名提供商的数量
         self.dnp_count = len(self.dnp_list)
 
@@ -102,7 +98,7 @@ class App:
         """
         筛选域名提供商
         """
-        # 配置中的 ISPS 遍历
+        dnps = []
         for name in dnp_arr:
             # dnps 遍历
             for dnp in self.dnp_list:
@@ -110,10 +106,11 @@ class App:
                 dnp_name = str(dnp.provider_name).lower()
                 # 匹配名称
                 if name == dnp_name:
-                    dnp.supported(self.config.domain.suffixes)
-                    self.dnp_list.append(dnp)
+                    if dnp.supported(self.config.domain.suffixes):
+                        dnps.append(dnp)
                     # 数据已匹配，跳出此循环
                     break
+        self.dnp_list = dnps
         return self
 
     def _check_dnps(self):
@@ -324,13 +321,15 @@ class App:
 
         return upload_info
 
-    def run(self):
-        try:
-            # self.prepare().fetch()
-            # self.save_domain_list()
+    def run(self, custom_domain=None):
+        logging.debug(self.config)
 
-            # # 保存查询的数据
-            # self.save_result_csv()
+        try:
+            self.prepare(custom_domain).fetch()
+            self.save_domain_list()
+
+            # 保存查询的数据
+            self.save_result_csv()
 
             # 上传到服务器
             upload_info = self.upload_result_csv()
