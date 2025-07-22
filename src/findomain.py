@@ -60,7 +60,7 @@ def load_config(args):
     if os.environ.get("FD_LOG_LEVEL"):
         config.setting.log_level = os.environ.get("FD_LOG_LEVEL")
     if os.environ.get("FD_START_CHAR"):
-        config.domain.start_char = os.environ.get("FD_START_CHAR").split('.')[0]
+        config.domain.start_char = os.environ.get("FD_START_CHAR").split(".")[0]
     return config
 
 

@@ -27,6 +27,7 @@ jobs:
       FD_SERVER_URL: ${{ secrets.SERVER_URL }}
       FD_SERVER_AUTH: ${{ secrets.SERVER_AUTH }}
       FD_DNP: ${{ secrets.DNP }}
+      FD_LOG_LEVEL: ${{ vars.LOG_LEVEL }}
 
     steps:
       - name: Checkout repository
