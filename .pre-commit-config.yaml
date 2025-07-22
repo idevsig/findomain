@@ -1,0 +1,14 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+    - id: check-yaml  # 保留非python相关钩子
+    - id: requirements-txt-fixer
+    - id: debug-statements
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.12.4
+  hooks:
+    - id: ruff
+      name: ruff lint and fix
+      args: [--fix, --format]

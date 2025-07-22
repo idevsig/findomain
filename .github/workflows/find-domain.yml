@@ -10,14 +10,14 @@ on:
       domain:
         description: "Domain"
         default: ""
+      domain_url:
+        description: "Domain URL"
+        default: ""
 
   # push:
     # branches: [ main ]
   # schedule:
   #   - cron: "*/40 * * * *"
-
-env:
-  DOMAIN: ${{ github.event.inputs.domain }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -28,25 +28,40 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+      - uses: actions/checkout@v4
 
-      - name: Install requirements
-        run: |
-          pip install -r requirements.txt
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Set up Python
+        run: uv python install
 
       - name: Working
         env:
-          YAML_URL: ${{ secrets.YAML_URL}}
-        run: python main.py
+          DOMAIN_INPUT: ${{ github.event.inputs.domain }}
+          DOMAIN_URL_INPUT: ${{ github.event.inputs.domain_url }}
+          FD_CONFIG_JSON: ${{ secrets.CONFIG_JSON}}
+          FD_DOMAIN_URL: ${{ secrets.DOMAIN_URL}}
+          FD_DOMAIN: ${{ secrets.DOMAIN }}
+          FD_SERVER_URL: ${{ secrets.SERVER_URL}}
+          FD_SERVER_AUTH: ${{ secrets.SERVER_AUTH}}
+          FD_DNP: ${{ secrets.DNP}}
+        run:
+        - |
+          if [ -n "$DOMAIN_INPUT" ]; then
+            echo "FD_DOMAIN=$DOMAIN_INPUT" >> $GITHUB_ENV
+          fi
+
+          if [ -n "$DOMAIN_URL_INPUT" ]; then
+            echo "FD_DOMAIN_URL=$DOMAIN_URL_INPUT" >> $GITHUB_ENV
+          fi
+        - |
+          uv sync
+          uv run findomain
 
       - name: Upload Domain Log
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: find-domain artifact
-          path: |
-            domain.txt
-            *_domain.log
+          path: logs
           retention-days: 3

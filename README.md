@@ -44,7 +44,8 @@ uv run findomain -d idev.top
 
 ## 配置
 
-设置环境变量 `DOMAIN_URL` 后，可以从该网址获取域名部分的配置信息，并覆盖本地的配置信息。
+- 可配置环境变量 `FD_CONFIG_JSON` 作为全局的值（内容格式参考 [`config.json5`](config.json5)）
+- 设置环境变量 `FD_DOMAIN_URL` 后，可以从该网址获取域名部分的配置信息，并覆盖本地的配置信息。
 
 <details>
 <summary>查看配置信息</summary>
@@ -73,7 +74,7 @@ uv run findomain -d idev.top
     // WARN = WARNING
     // INFO = 20
     // DEBUG = 10
-    // NOTSET = 0    
+    // NOTSET = 0
     "log_level": "info",
     // 日志目录
     "log_dir": "logs",
@@ -171,19 +172,27 @@ uv run findomain -d idev.top
 ## 命令行帮助信息
 ```bash
 findomain --help
-usage: findomain [-h] [-c CONFIG] [-d DOMAIN] [-u URL]
+usage: findomain [-h] [-c CONFIG] [-d DOMAIN] [-u URL] [-t TRANSFER] [-p DNP]
 
 Find Domain Tool
 
 options:
-  -h, --help           show this help message and exit
-  -c, --config CONFIG  Config file path
-  -d, --domain DOMAIN  Domain to query
-  -u, --url URL        Config information from url
+  -h, --help            show this help message and exit
+  -c, --config CONFIG   Config file path
+  -d, --domain DOMAIN   Domain to query
+  -u, --url URL         Config information from url
+  -s, --server_url SERVER_URL
+                        Server url for uploading query results
+  -a, --server_auth SERVER_AUTH
+                        Server auth for uploading query results
+  -p, --dnp DNP         Whois providers, eg: west, qcloud, zzidc
 ```
-> -d 查询单个域名，如 idev.top。可通过环境变量设置 `DOMAIN`
-> -c 指定配置文件路径，如 config.toml 或 config.json5   
-> -u 从网络获取域名(`domain`)部分信息，如 http://0.0.0.0:8000/domain_info.json , 可通过环境变量 `DOMAIN_URL` 设置
+> -c 指定配置文件路径，如 config.toml 或 config.json5
+> -d 查询单个域名，如 idev.top。可通过环境变量设置 `FD_DOMAIN`
+> -u 从网络获取域名(`domain`)部分信息，如 http://0.0.0.0:8000/domain_info.json , 可通过环境变量 `FD_DOMAIN_URL` 设置
+> -s 上传查询结果的服务器地址，可通过环境变量 `FD_SERVER_URL` 设置。含 `@` 则会替换成日期 `yyyyMMdd`
+> -a 上传查询结果的服务器鉴权信息，可通过环境变量 `FD_SERVER_AUTH` 设置
+> -p 指定 Whois 提供商，可通过环境变量 `FD_DNP` 设置
 
 ## 仓库镜像
 

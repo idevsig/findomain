@@ -16,3 +16,7 @@ findomain = "findomain:main"
 
 [tool.uv]
 package = true
+
+[tool.ruff]
+line-length = 79
+fix = true
