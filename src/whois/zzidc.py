@@ -17,18 +17,18 @@ class Zzidc(WhoisABC):
     def __init__(self):
         super().__init__()
         self.base_urls = [
-            "https://www.zzidc.com",
+            'https://www.zzidc.com',
             # 'https://www.zzidc.hk',
         ]
         self.supported_suffixes = [
-            "net",
-            "com",
-            "cn",
-            "cc",
-            "top",
-            "wang",
-            "vip",
-            "xyz",
+            'net',
+            'com',
+            'cn',
+            'cc',
+            'top',
+            'wang',
+            'vip',
+            'xyz',
         ]
         # self.enable = False
 
@@ -36,12 +36,12 @@ class Zzidc(WhoisABC):
         """
         生成请求的 URL
         """
-        return f"{self.base_url}/domain/checkDomain"
+        return f'{self.base_url}/domain/checkDomain'
 
     def fetch(self, url, domain):
         """请求数据"""
         # 对于SSL问题，尝试禁用SSL验证
-        return HttpRequest().post(url, data={"domain": domain}).response
+        return HttpRequest().post(url, data={'domain': domain}).response
 
     def query(self, domain):
         """
@@ -54,27 +54,28 @@ class Zzidc(WhoisABC):
         result = QueryResult(
             domain=domain,
             available=False,
-            registration_date="",
-            expiration_date="",
+            status='',
+            registration_date='',
+            expiration_date='',
             error_code=1,
             provider=self.provider_name,
         )
         response = self.fetch(self._make_request_url(), domain)
-        logging.debug(f"{self.provider_name}, {response.text}")
         try:
+            logging.debug(f'{self.provider_name}, {response.text}')
             # print(response.text)
             if response.status_code != 200:
-                raise ValueError(f"status code {response.status_code}")
+                raise ValueError(f'status code {response.status_code}')
 
-            date_pattern = r"val:\s*(\d+)"
+            date_pattern = r'val:\s*(\d+)'
             val_match = re.search(date_pattern, response.text)
             if val_match:
-                result.available = val_match.group(1) == "1"
+                result.available = val_match.group(1) == '1'
 
             result.error_code = 0
         except Exception as e:
             raise ValueError(
-                f"Error: {self.name} find domain: {domain}, err:{e}",
+                f'Error: {self.name} find domain: {domain}, err:{e}',
             )
 
         return result

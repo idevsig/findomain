@@ -9,8 +9,11 @@ class QueryResult:
 
     domain: str  # 域名
     available: bool  # 是否可注册
+    status: str | None = None  # 域名状态
     registration_date: str | None = None  # 注册时间
     expiration_date: str | None = None  # 过期时间
+    nameserver: str | None = None  # 域名服务器
+    icpInfo: str | None = None  # ICP 备案信息
     error_code: int = 0  # 查询操作
     provider: str | None = None  # 提供商
 
@@ -24,20 +27,26 @@ class QueryResult:
         return (
             self.domain,
             self.available,
+            self.status,
             self.registration_date,
             self.expiration_date,
+            self.nameserver,
+            self.icpInfo,
             self.error_code,
         )
 
     def to_json(self):
         """转换为 JSON 格式"""
         return {
-            "domain": self.domain,
-            "available": self.available,
-            "registration_date": self.registration_date,
-            "expiration_date": self.expiration_date,
-            "error_code": self.error_code,
-            "provider": self.provider,
+            'domain': self.domain,
+            'available': self.available,
+            'status': self.status,
+            'registration_date': self.registration_date,
+            'expiration_date': self.expiration_date,
+            'nameserver': self.nameserver,
+            'icpInfo': self.icpInfo,
+            'error_code': self.error_code,
+            'provider': self.provider,
         }
 
     def to_array(self):
@@ -45,12 +54,15 @@ class QueryResult:
         return [
             self.domain,
             self.available,
+            self.status,
             self.registration_date,
             self.expiration_date,
+            self.nameserver,
+            self.icpInfo,
             self.error_code,
             self.provider,
         ]
 
     def to_string(self):
         """转换为字符串格式"""
-        return f"{self.domain}, {self.available}, {self.registration_date}, {self.expiration_date}, {self.error_code}, {self.provider}"
+        return f'{self.domain}, {self.available}, {self.status}, {self.registration_date}, {self.expiration_date}, {self.nameserver}, {self.icpInfo}, {self.error_code}, {self.provider}'

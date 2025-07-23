@@ -19,7 +19,7 @@ class WhoisABC(ABC):
     def __init__(self):
         # 在类的实例化时，将 _enable 默认设置为 True
         self._enable: bool = True
-        self._base_url: str = ""
+        self._base_url: str = ''
 
     @property
     def provider_name(self) -> str:
@@ -42,7 +42,7 @@ class WhoisABC(ABC):
         :param value: The new enable status.
         """
         if not isinstance(value, bool):
-            raise TypeError("enable must be a boolean")
+            raise TypeError('enable must be a boolean')
         self._enable = value
 
     @property
@@ -60,7 +60,7 @@ class WhoisABC(ABC):
         """
         # 你可以在这里添加验证逻辑，例如检查是否是合法的URL
         if not isinstance(value, str):
-            raise TypeError("base_url must be a string")
+            raise TypeError('base_url must be a string')
         self._base_url = value  # 将新值赋给内部变量
 
     @property
@@ -78,13 +78,13 @@ class WhoisABC(ABC):
         """
         # 第一步：检查 value 是否是一个列表 (list)
         if not isinstance(value, list):
-            raise TypeError("supported_suffixes must be a list.")
+            raise TypeError('supported_suffixes must be a list.')
 
         # 第二步：检查列表中的所有元素是否都是字符串 (str)
         # 使用 all() 和列表推导式或生成器表达式进行高效检查
         if not all(isinstance(item, str) and len(item) > 1 for item in value):
             raise TypeError(
-                "All items in supported_suffixes list must be strings.",
+                'All items in supported_suffixes list must be strings.',
             )
 
         self._supported_suffixes = value
@@ -95,14 +95,14 @@ class WhoisABC(ABC):
         Returns the base host for the WHOIS provider's API.
         """
         base_url = urlparse(self.base_url)
-        return base_url.hostname if base_url.hostname else ""
+        return base_url.hostname if base_url.hostname else ''
 
     def _is_service_available(self) -> bool:
         """检查服务是否可用"""
         try:
             if not self.base_host:
                 raise ValueError(
-                    "Error: base_host is empty, cannot check service availability.",
+                    'Error: base_host is empty, cannot check service availability.',
                 )
 
             socket.gethostbyname(self.base_host)
@@ -110,12 +110,12 @@ class WhoisABC(ABC):
         except socket.gaierror as e:
             # Use 'e' only within this block
             raise ValueError(
-                f"DNS resolution failed for {self.base_host}: {e}",
+                f'DNS resolution failed for {self.base_host}: {e}',
             )
         except Exception as e:
             # Use 'e' only within this block
             raise ValueError(
-                f"An unexpected error occurred during service availability check: {e}",
+                f'An unexpected error occurred during service availability check: {e}',
             )
 
     def supported(self, suffix, strict=True) -> bool:
@@ -126,13 +126,13 @@ class WhoisABC(ABC):
         """
         if not self.supported_suffixes:
             return True
-        
+
         if suffix in self.supported_suffixes:
             return True
-        
+
         if strict:
             raise ValueError(
-                f"Error: ({self.provider_name}) this suffix is not supported: {suffix}"
+                f'Error: ({self.provider_name}) this suffix is not supported: {suffix}'
             )
         return False
 

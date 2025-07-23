@@ -14,6 +14,9 @@ wheels/
 .vscode/
 .marscode/
 
+server/*.json
+
 # log
 logs/
-*.log
+/**.log
+/**.csv

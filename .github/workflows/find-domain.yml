@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production 
     env:
+      TZ: Asia/Shanghai
       FD_CONFIG_JSON: ${{ secrets.CONFIG_JSON }}
       FD_DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
       FD_DOMAIN: ${{ secrets.DOMAIN }}
@@ -45,7 +46,6 @@ jobs:
           DOMAIN_URL_INPUT: ${{ github.event.inputs.domain_url }}
           START_CHAR_INPUT: ${{ github.event.inputs.start_char }}
         run: |
-          echo "DOMAIN_INPUT: $DOMAIN_INPUT"
           if [ -n "$DOMAIN_INPUT" ]; then
             echo "DOMAIN_INPUT=$DOMAIN_INPUT"
             echo "FD_DOMAIN=$DOMAIN_INPUT" >> $GITHUB_ENV

@@ -17,7 +17,7 @@ class NotifyABC(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def _build_url(self, timestamp: str = "", sign: str = "") -> str:
+    def _build_url(self, timestamp: str = '', sign: str = '') -> str:
         """
         构建请求 URL
         """

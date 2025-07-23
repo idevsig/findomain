@@ -23,7 +23,7 @@
     // INFO = 20
     // DEBUG = 10
     // NOTSET = 0
-    "log_level": "DEBUG",
+    "log_level": "info",
     // 日志目录
     "log_dir": "logs",
     // 日志文件名
@@ -45,12 +45,14 @@
     "alphabets": "",
     // 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
     "start_char": "",
+    // 结束域名（以此域名结束记录(含)，字符长度必须与 length 一致）
+    "end_char": "",
     // 组合前缀
     "prefix": "",
     // 组合后缀
     "suffix": "",
-    // 是否已完成
-    "done": 0
+    // 断点续查网址 {"start_char": ""}
+    "resume_url": "http://0.0.0.0:8000"
   },
   // Whois
   "whois": {
@@ -59,7 +61,7 @@
     // 默认 Whois 提供商
     // west.西部数码(带注册时间),qcloud.腾讯云,zzidc.景安
     // 比如: west,qcloud,zzidc
-    "dnp": ""
+    "dnp": "west"
   },
   // 通知
   "notify": {

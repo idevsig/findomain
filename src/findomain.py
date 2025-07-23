@@ -6,33 +6,32 @@ import os
 from app import App
 from config import Config
 from logger import setup_logging
-from utils.util import remove_suffix
 
 
 def arguments():
-    parser = argparse.ArgumentParser(description="Find Domain Tool")
+    parser = argparse.ArgumentParser(description='Find Domain Tool')
     parser.add_argument(
-        "-c",
-        "--config",
-        default="config.json5",
-        help="Config file path",
+        '-c',
+        '--config',
+        default='config.json5',
+        help='Config file path',
     )
-    parser.add_argument("-d", "--domain", help="Domain to query")
-    parser.add_argument("-u", "--url", help="Config information from url")
+    parser.add_argument('-d', '--domain', help='Domain to query')
+    parser.add_argument('-u', '--url', help='Config information from url')
     parser.add_argument(
-        "-s",
-        "--server_url",
-        help="Server url for uploading query results",
-    )
-    parser.add_argument(
-        "-a",
-        "--server_auth",
-        help="Server auth for uploading query results",
+        '-s',
+        '--server_url',
+        help='Server url for uploading query results',
     )
     parser.add_argument(
-        "-p",
-        "--dnp",
-        help="Whois providers, eg: west, qcloud, zzidc",
+        '-a',
+        '--server_auth',
+        help='Server auth for uploading query results',
+    )
+    parser.add_argument(
+        '-p',
+        '--dnp',
+        help='Whois providers, eg: west, qcloud, zzidc',
     )
     return parser.parse_args()
 
@@ -47,21 +46,28 @@ def load_config(args):
     if args.server_auth:
         config.setting.server_auth = args.server_auth
     if args.dnp:
-        config.whois.dnp = args.dnp.replace(" ", "")
+        config.whois.dnp = args.dnp.replace(' ', '')
 
     # 从环境变量中加载配置
-    if os.environ.get("FD_DOMAIN_URL"):
-        config.setting.url = os.environ.get("FD_DOMAIN_URL")
-    if os.environ.get("FD_SERVER_URL"):
-        config.setting.server_url = os.environ.get("FD_SERVER_URL")
-    if os.environ.get("FD_SERVER_AUTH"):
-        config.setting.server_auth = os.environ.get("FD_SERVER_AUTH")
-    if os.environ.get("FD_DNP"):
-        config.whois.dnp = os.environ.get("FD_DNP").replace(" ", "")
-    if os.environ.get("FD_LOG_LEVEL"):
-        config.setting.log_level = os.environ.get("FD_LOG_LEVEL")
-    if os.environ.get("FD_START_CHAR"):
-        config.domain.start_char = remove_suffix(os.environ.get("FD_START_CHAR"))
+    if os.environ.get('FD_DOMAIN_URL'):
+        config.setting.url = os.environ.get('FD_DOMAIN_URL')
+    if os.environ.get('FD_SERVER_URL'):
+        config.setting.server_url = os.environ.get('FD_SERVER_URL')
+    if os.environ.get('FD_SERVER_AUTH'):
+        config.setting.server_auth = os.environ.get('FD_SERVER_AUTH')
+    if os.environ.get('FD_DNP'):
+        config.whois.dnp = os.environ.get('FD_DNP').replace(' ', '')
+    if os.environ.get('FD_LOG_LEVEL'):
+        config.setting.log_level = os.environ.get('FD_LOG_LEVEL')
+    if os.environ.get('FD_START_CHAR'):
+        start_char, *rest = os.environ.get('FD_START_CHAR').split('.')
+        config.domain.start_char = start_char
+        if rest and rest[0] != config.domain.suffixes:
+            print(
+                f'Warning: start_char suffix "{rest[0]}" not match domain.suffixes "{config.domain.suffixes}"',
+            )
+            exit(1)
+
     return config
 
 
@@ -76,13 +82,9 @@ def main():
         config.setting.log_level,
     )
 
-    domain = args.domain or os.environ.get("FD_DOMAIN")
-    # 简单判断域名是否合法
-    if domain and "." not in domain:
-        raise ValueError(f"Invalid domain: {domain}")
-
+    domain = args.domain or os.environ.get('FD_DOMAIN')
     App(config).run(domain)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

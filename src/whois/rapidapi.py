@@ -17,15 +17,15 @@ class Rapidapi(WhoisABC):
 
     def __init__(self):
         super().__init__()
-        self.base_url = "https://pointsdb-bulk-whois-v1.p.rapidapi.com"
+        self.base_url = 'https://pointsdb-bulk-whois-v1.p.rapidapi.com'
         self.enable = False  # 限制太多，不建议使用
-        self.apk_key = "e7cc80a32emsh3af8115155e1edcp11b416jsnbe22a2f028d0"
+        self.apk_key = 'e7cc80a32emsh3af8115155e1edcp11b416jsnbe22a2f028d0'
 
     def _make_request_url(self):
         """
         生成请求的 URL
         """
-        return f"{self.base_url}/whois"
+        return f'{self.base_url}/whois'
 
     def fetch(self, url, domain):
         """
@@ -33,13 +33,16 @@ class Rapidapi(WhoisABC):
         :param url: 网址
         :param domain: 域名
         """
-        querystring = {"domains": domain, "format": "split"}
+        querystring = {'domains': domain, 'format': 'split'}
         headers = {
-            "x-rapidapi-host": self.base_host,
-            "x-rapidapi-key": self.apk_key,
+            'x-rapidapi-host': self.base_host,
+            'x-rapidapi-key': self.apk_key,
         }
         return (
-            HttpRequest().update_headers(headers).get(url, params=querystring).response
+            HttpRequest()
+            .update_headers(headers)
+            .get(url, params=querystring)
+            .response
         )
 
     def query(self, domain):
@@ -52,30 +55,33 @@ class Rapidapi(WhoisABC):
         result = QueryResult(
             domain=domain,
             available=False,
-            registration_date="",
-            expiration_date="",
+            registration_date='',
+            expiration_date='',
             error_code=1,
             provider=self.provider_name,
         )
         response = self.fetch(self._make_request_url(), domain)
-        logging.debug(f"{self.provider_name}, {response.text}")
         try:
+            logging.debug(f'{self.provider_name}, {response.text}')
             # print(response.text)
             if response.status_code != 200:
-                raise ValueError(f"status code {response.status_code}")
+                raise ValueError(f'status code {response.status_code}')
 
             resp = response.json()
             result.error_code = 0
-            date_pattern = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"
+            date_pattern = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
             info = resp[domain]
-            if "does not exist" in info[0]["0"]:
+            if 'does not exist' in info[0]['0']:
                 result.available = True
             else:
                 # 提取日期
                 for i in info:
                     for _, item in i.items():
                         # 创建时间
-                        if not result.registration_date and "Creation Date:" in item:
+                        if (
+                            not result.registration_date
+                            and 'Creation Date:' in item
+                        ):
                             result.registration_date = re.findall(
                                 date_pattern,
                                 item,
@@ -83,7 +89,7 @@ class Rapidapi(WhoisABC):
                         # 过期时间
                         elif (
                             not result.expiration_date
-                            and "Registry Expiry Date:" in item
+                            and 'Registry Expiry Date:' in item
                         ):
                             result.expiration_date = re.findall(
                                 date_pattern,
@@ -94,6 +100,6 @@ class Rapidapi(WhoisABC):
                     if result.registration_date and result.expiration_date:
                         break
         except Exception as e:
-            raise ValueError(f"Error: Rapidapi find domain: {domain}, err:{e}")
+            raise ValueError(f'Error: Rapidapi find domain: {domain}, err:{e}')
 
         return result

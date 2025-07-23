@@ -60,9 +60,13 @@ uv run findomain -d idev.top
   "setting": {
     // 域名信息获取网址，断点查询使用，即 domain 项
     "url": "",
-    // 查询结果保存网址
-    // 具体 https://github.com/dutchcoders/transfer.sh 搭建的站点
-    "transfer": "",
+    // 查询结果上传到指定服务器
+    // 比如 https://github.com/dutchcoders/transfer.sh 搭建的站点
+    // 参数中带有 @，则会被替换成日期
+    "server_url": "",
+    // 上传到指定服务器的鉴权信息
+    // eg: username:password
+    "server_auth": "",
     // 本次查询域名列表保存文件名
     "domain_file": "domains.log",
     // 最大查询次数
@@ -76,7 +80,7 @@ uv run findomain -d idev.top
     // INFO = 20
     // DEBUG = 10
     // NOTSET = 0
-    "log_level": "info",
+    "log_level": "DEBUG",
     // 日志目录
     "log_dir": "logs",
     // 日志文件名
@@ -87,23 +91,25 @@ uv run findomain -d idev.top
   // 域名
   "domain": {
     // 后缀
-    "suffixes": "cn",
+    "suffixes": "com",
     // 长度
     "length": 1,
     // 组合模式
     // 1.纯数字，2.纯字母，3.纯数字+纯字母，4.数字与字母混合，5.自定义字符
     // 6.杂米（不含纯数字和字母），7.杂米，自定义字符
-    "mode": 3,
+    "mode": 1,
     // 自定义组合字母表
     "alphabets": "",
     // 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
     "start_char": "",
+    // 结束域名（以此域名结束记录(含)，字符长度必须与 length 一致）
+    "end_char": "",
     // 组合前缀
     "prefix": "",
     // 组合后缀
     "suffix": "",
-    // 是否已完成
-    "done": 1
+    // 断点续查网址 {"start_char": "", "updated_time": ""}
+    "resume_url": ""
   },
   // Whois
   "whois": {
@@ -161,12 +167,14 @@ uv run findomain -d idev.top
   "alphabets": "",
   // 起始域名（以此域名开始记录(含)，字符长度必须与 length 一致）
   "start_char": "",
+  // 结束域名（以此域名结束记录(含)，字符长度必须与 length 一致）
+  "end_char": "",
   // 组合前缀
   "prefix": "",
   // 组合后缀
   "suffix": "",
-  // 是否已完成
-  "done": 0
+  // 断点续查网址 {"start_char": "", "updated_time": ""}
+  "resume_url": ""
 }
 ```
 

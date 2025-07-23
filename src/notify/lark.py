@@ -9,4 +9,4 @@ class Lark(Feishu):
     """
 
     def _build_url(self) -> str:
-        return f"https://open.larksuite.com/open-apis/bot/v2/hook/{self.token}"
+        return f'https://open.larksuite.com/open-apis/bot/v2/hook/{self.token}'

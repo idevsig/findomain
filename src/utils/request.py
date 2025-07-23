@@ -21,20 +21,20 @@ class HttpRequest:
     """封装 requests 库的 HTTP 客户端，支持代理、请求头、Cookie 管理及重试机制。"""
 
     USER_AGENTS = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
     ]
 
     SUPPORTED_METHODS = {
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE",
-        "HEAD",
-        "OPTIONS",
-        "PATCH",
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE',
+        'HEAD',
+        'OPTIONS',
+        'PATCH',
     }
 
     def __init__(self, proxies: dict[str, str] | None = None):
@@ -46,20 +46,20 @@ class HttpRequest:
 
     def _default_headers(self) -> dict[str, str]:
         return {
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Cache-Control": "no-cache",
-            "DNT": "1",
-            "Pragma": "no-cache",
-            "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": '"Linux"',
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
-            "User-Agent": random.choice(self.USER_AGENTS),
-            "X-Requested-With": "XMLHttpRequest",
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Cache-Control': 'no-cache',
+            'DNT': '1',
+            'Pragma': 'no-cache',
+            'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Linux"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'User-Agent': random.choice(self.USER_AGENTS),
+            'X-Requested-With': 'XMLHttpRequest',
         }
 
     def set_auth(self, username: str, password: str):
@@ -91,13 +91,13 @@ class HttpRequest:
             return response.cookies
         except RequestException as e:
             raise RequestException(
-                f"Failed to fetch cookies from {url}: {e}",
+                f'Failed to fetch cookies from {url}: {e}',
             ) from e
 
     def set_cookies_from_url(self, url: str, timeout: float = 10):
         cookies = self.fetch_cookies_from_url(url, timeout)
         self.update_cookies(cookies)
-        self.session.headers["Referer"] = url
+        self.session.headers['Referer'] = url
 
     def _request_method_handler(
         self,
@@ -109,12 +109,12 @@ class HttpRequest:
         **kwargs,
     ) -> Response:
         if method.upper() not in self.SUPPORTED_METHODS:
-            raise ValueError(f"Unsupported HTTP method: {method}")
+            raise ValueError(f'Unsupported HTTP method: {method}')
 
         if auth is None and self.auth is not None:
-            kwargs["auth"] = self.auth
+            kwargs['auth'] = self.auth
         elif auth:
-            kwargs["auth"] = auth
+            kwargs['auth'] = auth
 
         for attempt in range(retries + 1):
             try:
@@ -129,19 +129,19 @@ class HttpRequest:
             ) as e:
                 if attempt >= retries:
                     raise RequestException(
-                        f"Request failed after {retries + 1} attempts: {e}",
+                        f'Request failed after {retries + 1} attempts: {e}',
                     ) from e
                 time.sleep(backoff * (2**attempt))
                 if isinstance(e, Timeout):
-                    kwargs["timeout"] = kwargs.get("timeout", 10) * 1.5
+                    kwargs['timeout'] = kwargs.get('timeout', 10) * 1.5
                 if isinstance(e, SSLError):
-                    kwargs["verify"] = False
+                    kwargs['verify'] = False
             except RequestException as e:
                 raise RequestException(
-                    f"{method.upper()} request failed for {url}: {e}",
+                    f'{method.upper()} request failed for {url}: {e}',
                 ) from e
 
-        raise RequestException("Unreachable error in retry logic")
+        raise RequestException('Unreachable error in retry logic')
 
     def _request(
         self,
@@ -170,7 +170,7 @@ class HttpRequest:
         auth: tuple[str, str] | None = None,
     ) -> HttpRequest:
         return self._request(
-            "GET",
+            'GET',
             url,
             params=params,
             timeout=timeout,
@@ -191,7 +191,7 @@ class HttpRequest:
         auth: tuple[str, str] | None = None,
     ) -> HttpRequest:
         return self._request(
-            "POST",
+            'POST',
             url,
             data=data,
             json=json,
@@ -214,7 +214,7 @@ class HttpRequest:
         auth: tuple[str, str] | None = None,
     ) -> HttpRequest:
         return self._request(
-            "PUT",
+            'PUT',
             url,
             data=data,
             json=json,
@@ -228,7 +228,7 @@ class HttpRequest:
     @property
     def response(self) -> Response:
         if self._response is None:
-            raise ValueError("No request has been made yet.")
+            raise ValueError('No request has been made yet.')
         return self._response
 
     @property
