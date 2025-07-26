@@ -42,6 +42,8 @@ DOMAIN=idev.top uv run findomain
 uv run findomain -d idev.top
 ```
 
+查询完成之后，将脚本 `scripts/merge.sh` 复制到结果目录，执行合并所有结果文件，并生成一个 `.csv` 文件。
+
 ## 配置
 
 - 可配置环境变量 `FD_CONFIG_JSON` 作为全局的值（内容格式参考 [`config.json5`](config.json5)）
