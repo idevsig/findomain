@@ -18,5 +18,5 @@ server/*.json
 
 # log
 logs/
-/**.log
-/**.csv
+**.log
+**.csv

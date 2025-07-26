@@ -5,8 +5,44 @@ import os
 from datetime import datetime
 import socketserver
 import socket
+import requests
 
 DATA_FILE = 'domains.json'
+
+
+def workflow_dispatch():
+    token = os.getenv('GITHUB_TOKEN')
+    if not token:
+        return
+
+    repo = os.getenv('FD_REPOSITORY', 'idev-sig/findomain')
+    ref = os.getenv('FD_REF', 'main')
+    workflow_filename = os.getenv('FD_WORKFLOW', 'find-domain.yml')
+
+    inputs = (
+        {
+            'domain': '',
+            'domain_url': '',
+            'start_char': '',
+        },
+    )
+
+    headers = {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': f'token {token}',
+    }
+
+    data = {'ref': ref, 'inputs': inputs}
+
+    url = f'https://api.github.com/repos/{repo}/actions/workflows/{workflow_filename}/dispatches'
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code == 204:
+        print('🎉 GitHub Action triggered successfully!')
+    else:
+        print(
+            f'❌ Failed to trigger: {response.status_code} - {response.text}'
+        )
 
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
@@ -41,6 +77,10 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             with open(DATA_FILE, 'w') as f:
                 json.dump(data, f, indent=2)
 
+            # 未完成，则触发 GitHub Action
+            if last_query_domain != '-1':
+                workflow_dispatch()
+
             self._send_json(201, data)
 
         except json.JSONDecodeError:
@@ -72,6 +112,9 @@ def parse_arguments():
     )
     parser.add_argument(
         '-p', '--port', type=int, default=8000, help='Port to listen on'
+    )
+    parser.add_argument(
+        '-n', '--name', default='findomain_server', help='Server name'
     )
     return parser.parse_args()
 
