@@ -285,7 +285,7 @@ class App:
         """
         with open(self.result_file, 'w') as f:
             f.write(
-                'domain, available, registration_date, expiration_date, error_code, provider\n',
+                'domain, available, status, registration_date, expiration_date, nameserver, icp, error_code, provider\n',
             )
             for result in self.results:
                 f.write(f'{result.to_string()}\n')
