@@ -1,109 +1,100 @@
 import argparse
 import http.server
 import json
+import os
 from datetime import datetime
 import socketserver
+import socket
 
 DATA_FILE = 'domains.json'
 
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
+    def _send_json(self, status_code, payload):
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(payload).encode('utf-8'))
+
     def do_POST(self):
         try:
-            # Get content length and read data
             content_length = int(self.headers.get('Content-Length', 0))
             raw_data = self.rfile.read(content_length).decode('utf-8')
-
-            # Parse JSON data
             data_json = json.loads(raw_data)
 
-            # Validate required fields
-            if 'last_query_domain' not in data_json:
-                self.send_response(400)
-                self.send_header('Content-Type', 'application/json')
-                self.end_headers()
-                self.wfile.write(
-                    json.dumps(
-                        {'error': 'Missing start_char in JSON data'}
-                    ).encode('utf-8')
+            last_query_domain = data_json.get('last_query_domain')
+            if not last_query_domain:
+                self._send_json(
+                    400, {'error': 'Missing last_query_domain in JSON data'}
                 )
                 return
 
+            updated_time = data_json.get(
+                'updated_time', datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            )
+
             data = {
-                'last_query_domain': data_json['last_query_domain'],
-                'updated_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'last_query_domain': last_query_domain,
+                'updated_time': updated_time,
             }
 
-            # Save to file
             with open(DATA_FILE, 'w') as f:
                 json.dump(data, f, indent=2)
 
-            # Send response
-            self.send_response(201)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode('utf-8'))
+            self._send_json(201, data)
 
+        except json.JSONDecodeError:
+            self._send_json(400, {'error': 'Invalid JSON data'})
         except Exception as e:
-            self.send_response(500)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
+            self._send_json(500, {'error': str(e)})
 
     def do_GET(self):
         try:
-            # Read data from file
-            try:
-                with open(DATA_FILE, 'r') as f:
-                    data = json.load(f)
-            except FileNotFoundError:
-                data = []
-
-            # Send response
-            if not data:
-                self.send_response(404)
-                self.send_header('Content-Type', 'text/html')
-                self.end_headers()
+            if not os.path.isfile(DATA_FILE):
+                self._send_json(200, {})  # 空字典响应
                 return
 
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(data).encode('utf-8'))
+            with open(DATA_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
 
+            self._send_json(200, data)
+        except json.JSONDecodeError:
+            self._send_json(
+                500, {'error': 'Failed to parse JSON from data file'}
+            )
         except Exception as e:
-            self.send_response(500)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
+            self._send_json(500, {'error': str(e)})
 
 
-def arguments():
+def parse_arguments():
     parser = argparse.ArgumentParser(
         description='Findomain Server for Resume Query'
     )
-    parser.add_argument('-p', '--port', default=8000, help='Port to listen on')
+    parser.add_argument(
+        '-p', '--port', type=int, default=8000, help='Port to listen on'
+    )
     return parser.parse_args()
+
+
+def run_server(port):
+    while True:
+        try:
+            with socketserver.TCPServer(('', port), RequestHandler) as httpd:
+                host = socket.gethostbyname(socket.gethostname())
+                print(f'Listening on http://{host}:{httpd.server_address[1]}')
+                print('Press Ctrl+C to stop')
+                httpd.serve_forever()
+        except OSError:
+            print(
+                f'Port {port} is already in use, trying a random available port...'
+            )
+            port = 0
 
 
 def main():
     print('Findomain Server for Resume Query')
-
-    args = arguments()
-    port = args.port
-
-    # 判断端口是否已被占用，若占用则随机端口再次运行服务器
-    while True:
-        try:
-            with socketserver.TCPServer(('', port), RequestHandler) as httpd:
-                print(
-                    f'Listening on http://{httpd.server_address[0]}:{httpd.server_address[1]}'
-                )
-                print('Press Ctrl+C to stop')
-                httpd.serve_forever()
-        except OSError:
-            print(f'Port {port} is already in use, trying another port...')
-            port = 0
+    args = parse_arguments()
+    run_server(args.port)
 
 
 if __name__ == '__main__':

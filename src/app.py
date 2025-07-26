@@ -182,6 +182,7 @@ class App:
 
             data = {
                 'last_query_domain': domain if domain else '-1',
+                'updated_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             }
             req = HttpRequest()
             req.post(self.config.domain.resume_url, json=data)

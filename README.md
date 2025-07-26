@@ -17,7 +17,7 @@
 
 - 通过 Git 仓库安装
   ```bash
-  uv tool install git+https://github.com/idevsig/findomain.git@main
+  uv tool install git+https://github.com/idev-sig/findomain.git@main
   ```
 
 ## 运行
@@ -208,4 +208,4 @@ options:
 - https://git.jetsung.com/idev/findomain
 - https://framagit.org/idev/findomain
 - https://gitcode.com/idev/findomain
-- https://github.com/idevsig/findomain
+- https://github.com/idev-sig/findomain
